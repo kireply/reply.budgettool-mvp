@@ -234,13 +234,13 @@ export default function WBSDetail() {
               <Tooltip formatter={(v) => formatCurrency(Number(v))} />
               <Legend />
               {selectedScenarios.includes('budget') && (
-                <Bar dataKey="budget" name={t('scenario.budget')} fill={scenarioColors.budget} radius={[4,4,0,0]} opacity={0.85} />
+                <Bar isAnimationActive={false} dataKey="budget" name={t('scenario.budget')} fill={scenarioColors.budget} radius={[4,4,0,0]} opacity={0.85} />
               )}
               {selectedScenarios.includes('rolling') && (
-                <Bar dataKey="rolling" name={t('scenario.rolling')} fill={scenarioColors.rolling} radius={[4,4,0,0]} />
+                <Bar isAnimationActive={false} dataKey="rolling" name={t('scenario.rolling')} fill={scenarioColors.rolling} radius={[4,4,0,0]} />
               )}
               {selectedScenarios.includes('actual') && (
-                <Bar dataKey="actual" name={t('scenario.actual')} fill={scenarioColors.actual} radius={[4,4,0,0]} />
+                <Bar isAnimationActive={false} dataKey="actual" name={t('scenario.actual')} fill={scenarioColors.actual} radius={[4,4,0,0]} />
               )}
             </BarChart>
           </ResponsiveContainer>

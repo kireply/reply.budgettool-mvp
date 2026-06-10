@@ -84,13 +84,13 @@ export default function Dashboard() {
               <Tooltip formatter={(v) => formatCurrency(Number(v))} />
               {/* legend on top: rotated x labels would overlap a bottom legend */}
               <Legend verticalAlign="top" wrapperStyle={{ fontSize: 12, paddingBottom: 12 }} />
-              <Bar dataKey="pianificato" name={t('series.planned')} fill={chartColors.rolling} radius={[4,4,0,0]}
+              <Bar isAnimationActive={false} dataKey="pianificato" name={t('series.planned')} fill={chartColors.rolling} radius={[4,4,0,0]}
                 onClick={(d) => {
                   const area = (d as unknown as { area: string }).area;
                   setDrillArea(drillArea === area ? null : area);
                 }} style={{ cursor: 'pointer' }} />
-              <Bar dataKey="impegnato" name={t('series.committed')} fill={chartColors.impegnato} radius={[4,4,0,0]} />
-              <Bar dataKey="actual" name={t('series.actual')} fill={chartColors.actual} radius={[4,4,0,0]} />
+              <Bar isAnimationActive={false} dataKey="impegnato" name={t('series.committed')} fill={chartColors.impegnato} radius={[4,4,0,0]} />
+              <Bar isAnimationActive={false} dataKey="actual" name={t('series.actual')} fill={chartColors.actual} radius={[4,4,0,0]} />
             </BarChart>
           </ResponsiveContainer>
           {drillArea && (
@@ -110,7 +110,7 @@ export default function Dashboard() {
           </h2>
           <ResponsiveContainer width="100%" height={280}>
             <PieChart>
-              <Pie data={pieData} cx="50%" cy="45%" innerRadius={55} outerRadius={90}
+              <Pie isAnimationActive={false} data={pieData} cx="50%" cy="45%" innerRadius={55} outerRadius={90}
                 dataKey="value" nameKey="name">
                 {pieData.map((_, i) => <Cell key={i} fill={chartColors.series[i % chartColors.series.length]} />)}
               </Pie>

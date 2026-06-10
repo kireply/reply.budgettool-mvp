@@ -122,10 +122,10 @@ export default function Reportistica() {
                 <Tooltip formatter={(v) => formatCurrency(Number(v))} />
                 {/* legend on top: rotated x labels would overlap a bottom legend */}
                 <Legend verticalAlign="top" wrapperStyle={{ fontSize: 12, paddingBottom: 12 }} />
-                <Bar dataKey="budget" name={t('series.budget')} fill={chartColors.budget} radius={[4,4,0,0]} opacity={0.85} />
-                <Bar dataKey="rolling" name={t('series.rolling')} fill={chartColors.rolling} radius={[4,4,0,0]} />
-                <Bar dataKey="impegnato" name={t('series.committed')} fill={chartColors.impegnato} radius={[4,4,0,0]} />
-                <Bar dataKey="actual" name={t('series.actual')} fill={chartColors.actual} radius={[4,4,0,0]} />
+                <Bar isAnimationActive={false} dataKey="budget" name={t('series.budget')} fill={chartColors.budget} radius={[4,4,0,0]} opacity={0.85} />
+                <Bar isAnimationActive={false} dataKey="rolling" name={t('series.rolling')} fill={chartColors.rolling} radius={[4,4,0,0]} />
+                <Bar isAnimationActive={false} dataKey="impegnato" name={t('series.committed')} fill={chartColors.impegnato} radius={[4,4,0,0]} />
+                <Bar isAnimationActive={false} dataKey="actual" name={t('series.actual')} fill={chartColors.actual} radius={[4,4,0,0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -179,8 +179,8 @@ export default function Reportistica() {
                 <Tooltip formatter={(v, name) => [formatCurrency(Number(v)), name]} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
                 <CartesianGrid strokeDasharray="3 3" stroke={colors.grey100} />
-                <Bar dataKey="delta" name={t('series.variance')} fill={chartColors.impegnato} radius={[4,4,0,0]} />
-                <Bar dataKey="disponibile" name={t('series.available')} fill={chartColors.actual} radius={[4,4,0,0]} />
+                <Bar isAnimationActive={false} dataKey="delta" name={t('series.variance')} fill={chartColors.impegnato} radius={[4,4,0,0]} />
+                <Bar isAnimationActive={false} dataKey="disponibile" name={t('series.available')} fill={chartColors.actual} radius={[4,4,0,0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -237,9 +237,9 @@ export default function Reportistica() {
                 <YAxis tickFormatter={v => `${(v/1000).toFixed(0)}k`} tick={{ fontSize: 11, fill: colors.grey800 }} />
                 <Tooltip formatter={(v) => formatCurrency(Number(v))} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Bar dataKey="budget" name={t('series.budget')} fill={chartColors.budget} radius={[3,3,0,0]} opacity={0.85} />
-                <Bar dataKey="rolling" name={t('series.rolling')} fill={chartColors.rolling} radius={[3,3,0,0]} />
-                <Bar dataKey="actual" name={t('series.actual')} fill={chartColors.impegnato} radius={[3,3,0,0]} />
+                <Bar isAnimationActive={false} dataKey="budget" name={t('series.budget')} fill={chartColors.budget} radius={[3,3,0,0]} opacity={0.85} />
+                <Bar isAnimationActive={false} dataKey="rolling" name={t('series.rolling')} fill={chartColors.rolling} radius={[3,3,0,0]} />
+                <Bar isAnimationActive={false} dataKey="actual" name={t('series.actual')} fill={chartColors.impegnato} radius={[3,3,0,0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -252,9 +252,9 @@ export default function Reportistica() {
                 <Tooltip formatter={(v) => formatCurrency(Number(v))} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
                 <CartesianGrid strokeDasharray="3 3" stroke={colors.grey100} />
-                <Line type="monotone" dataKey="budget" name={t('series.budgetCum')} stroke={chartColors.budget} strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="rolling" name={t('series.rollingCum')} stroke={chartColors.rolling} strokeWidth={2} dot={false} strokeDasharray="5 3" />
-                <Line type="monotone" dataKey="actual" name={t('series.actualCum')} stroke={chartColors.impegnato} strokeWidth={2.5} dot={{ r: 3 }} />
+                <Line isAnimationActive={false} type="monotone" dataKey="budget" name={t('series.budgetCum')} stroke={chartColors.budget} strokeWidth={2} dot={false} />
+                <Line isAnimationActive={false} type="monotone" dataKey="rolling" name={t('series.rollingCum')} stroke={chartColors.rolling} strokeWidth={2} dot={false} strokeDasharray="5 3" />
+                <Line isAnimationActive={false} type="monotone" dataKey="actual" name={t('series.actualCum')} stroke={chartColors.impegnato} strokeWidth={2.5} dot={{ r: 3 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
