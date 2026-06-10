@@ -35,12 +35,9 @@ jobs:
       # so deep links like /wbs/new resolve through React Router
       - run: cp dist/index.html dist/404.html
 
-      # enablement: true creates the Pages site on first run.
-      # On a Free org plan this step fails for private repos — that failure
-      # is the definitive signal that the plan doesn't support it.
+      # Pages must be enabled once manually (Settings → Pages → Source: GitHub Actions);
+      # the workflow token lacks admin rights to create the site itself.
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
