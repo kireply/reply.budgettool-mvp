@@ -29,6 +29,18 @@ jobs:
 
       - run: npm run build
 
+      # Hard-fail if the single-file build didn't apply: the privately published
+      # Pages proxy mislabels external module scripts, so dist/index.html must
+      # not reference any.
+      - name: Verify single-file output
+        run: |
+          ls -la dist
+          if grep -q 'script type="module" src=' dist/index.html; then
+            echo "::error::index.html still references external module scripts — single-file inlining did not run"
+            exit 1
+          fi
+          echo "OK: index.html is self-contained ($(stat -c%s dist/index.html) bytes)"
+
       # SPA fallback: GitHub Pages serves 404.html for unknown paths,
       # so deep links like /wbs/new resolve through React Router
       - run: cp dist/index.html dist/404.html
