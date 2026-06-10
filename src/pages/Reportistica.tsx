@@ -120,7 +120,8 @@ export default function Reportistica() {
                 <XAxis dataKey="area" tick={{ fontSize: 11, fill: colors.grey800 }} angle={-25} textAnchor="end" />
                 <YAxis tickFormatter={v => `${(v/1000).toFixed(0)}k`} tick={{ fontSize: 11, fill: colors.grey800 }} />
                 <Tooltip formatter={(v) => formatCurrency(Number(v))} />
-                <Legend wrapperStyle={{ fontSize: 12 }} />
+                {/* legend on top: rotated x labels would overlap a bottom legend */}
+                <Legend verticalAlign="top" wrapperStyle={{ fontSize: 12, paddingBottom: 12 }} />
                 <Bar dataKey="budget" name={t('series.budget')} fill={chartColors.budget} radius={[4,4,0,0]} opacity={0.85} />
                 <Bar dataKey="rolling" name={t('series.rolling')} fill={chartColors.rolling} radius={[4,4,0,0]} />
                 <Bar dataKey="impegnato" name={t('series.committed')} fill={chartColors.impegnato} radius={[4,4,0,0]} />

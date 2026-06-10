@@ -82,7 +82,8 @@ export default function Dashboard() {
               <XAxis dataKey="area" tick={{ fontSize: 11, fill: colors.grey800 }} angle={-30} textAnchor="end" interval={0} />
               <YAxis tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} tick={{ fontSize: 11, fill: colors.grey800 }} />
               <Tooltip formatter={(v) => formatCurrency(Number(v))} />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
+              {/* legend on top: rotated x labels would overlap a bottom legend */}
+              <Legend verticalAlign="top" wrapperStyle={{ fontSize: 12, paddingBottom: 12 }} />
               <Bar dataKey="pianificato" name={t('series.planned')} fill={chartColors.rolling} radius={[4,4,0,0]}
                 onClick={(d) => {
                   const area = (d as unknown as { area: string }).area;
