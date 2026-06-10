@@ -86,7 +86,9 @@ Single source of truth — all mock data and types live here. Key types:
 - `PurchaseRequest` — references a WBS via `wbsId`; state machine: `Bozza → Inviata → Approvata → Inviata a SAP → PO Creato` (or `Rifiutata`)
 - `formatCurrency`, `getStatusColor`, `getWBSStatusColor` — shared formatting helpers exported from here
 
-Pages import directly from `mockData.ts`; there is no state management library. `PurchaseRequests.tsx` holds local `useState` for the PR list (new PRs created in the form are added to a local copy).
+Pages import directly from `mockData.ts`; there is no state management library.
+
+**Persistence:** the module arrays hydrate from localStorage (key `a2a-budget-tool-data-v1`) at module load and persist on every mutation. All mutations MUST go through the exported store functions — `addWBS`, `addPurchaseRequest`, `updatePRStatus` — never mutate the arrays directly. `PurchaseRequests.tsx` keeps a local `useState` mirror refreshed via `setPrs([...purchaseRequests])` after each mutation. Bump the storage key version when the seed data shape changes; `resetDemoData()` (sidebar action) clears storage and reloads.
 
 ### Internationalization (`src/i18n.tsx` + `src/translations.ts`)
 
