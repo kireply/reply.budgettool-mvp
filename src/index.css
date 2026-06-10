@@ -1,0 +1,317 @@
+@import "tailwindcss";
+
+/*
+  A2A Circular Design Language tokens — see src/kb/A2A_DESIGN_SYSTEM.md
+  Primary: Azure 500 #0B9AEC · Dark surfaces: Blue 800 #013A68
+  Animation standard: 300ms easeOutQuart cubic-bezier(0.25, 1, 0.5, 1)
+*/
+
+@theme {
+  --color-azure-500: #0B9AEC;
+  --color-azure-600: #0A8CD7;
+  --color-azure-50: #E7F5FE;
+  --color-blue-500: #016ABD;
+  --color-blue-800: #013A68;
+  --color-grey-800: #636B71;
+  --color-grey-300: #DAE5EE;
+  --color-grey-100: #EEF3F7;
+  --color-success: #1AAA55;
+  --color-warning: #FC9403;
+  --color-error: #DB3B21;
+  --font-family-sans: 'Life Sans', Arial, Helvetica, sans-serif;
+}
+
+:root {
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --motion-standard: 300ms var(--ease-out-quart);
+  --motion-suggestions: 400ms var(--ease-out-quart);
+}
+
+* {
+  font-family: 'Life Sans', Arial, Helvetica, sans-serif;
+}
+
+body {
+  background-color: #EEF3F7; /* Grey 100 */
+  color: #013A68;            /* Blue 800 */
+  font-weight: 450;
+}
+
+/* ---- Entrance animation: from below, fires once ---- */
+@keyframes cdl-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation: cdl-rise 300ms var(--ease-out-quart) both;
+}
+
+/* ---- Surfaces ---- */
+.card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #DAE5EE; /* Grey 300 */
+  padding: 24px;             /* spacing05 */
+  transition: box-shadow var(--motion-standard), border-color var(--motion-standard);
+}
+
+.card:hover {
+  border-color: #0B9AEC;
+}
+
+/* ---- Sidebar (Blue 800 dark surface) ---- */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background var(--motion-standard), color var(--motion-standard);
+  color: #9CC9E8;
+  font-size: 14px;
+  font-weight: 450;
+}
+
+.sidebar-item:hover {
+  background: rgba(11, 154, 236, 0.18);
+  color: white;
+}
+
+.sidebar-item.active {
+  background: #0B9AEC; /* Azure 500 */
+  color: white;
+  font-weight: 650;
+}
+
+/* ---- Primary CTA: the ONLY all-caps element in the CDL ---- */
+.cta-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px 10px 20px;
+  border: none;
+  border-radius: 28px;
+  background: #0B9AEC;
+  color: white;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--motion-standard), transform var(--motion-standard), box-shadow var(--motion-standard);
+}
+
+.cta-primary:hover:not(:disabled) {
+  background: #0A8CD7;
+  transform: translate(1px, -2px); /* magnetic hover, XY axis */
+  box-shadow: 0 6px 16px rgba(11, 154, 236, 0.35);
+}
+
+.cta-primary:disabled {
+  background: #DAE5EE;
+  color: #636B71;
+  cursor: not-allowed;
+}
+
+.cta-primary .cta-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  flex-shrink: 0;
+}
+
+.cta-primary:disabled .cta-circle {
+  background: rgba(99, 107, 113, 0.15);
+}
+
+/* ---- Secondary (outline) button ---- */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 28px;
+  border: 1px solid #DAE5EE;
+  background: white;
+  color: #013A68;
+  font-size: 13px;
+  font-weight: 550;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color var(--motion-standard), color var(--motion-standard), background var(--motion-standard);
+}
+
+.btn-secondary:hover {
+  border-color: #0B9AEC;
+  color: #0A8CD7;
+}
+
+/* ---- Ghost link: secondary actions, azure on light ---- */
+.ghost-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #0A8CD7;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color var(--motion-standard), gap var(--motion-standard);
+}
+
+.ghost-link:hover {
+  color: #016ABD;
+  gap: 9px;
+}
+
+/* ---- Forms ---- */
+.input,
+.select {
+  width: 100%;
+  font-size: 13px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid #DAE5EE;
+  color: #013A68;
+  background: white;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color var(--motion-standard), box-shadow var(--motion-standard);
+}
+
+.input:focus,
+.select:focus {
+  border-color: #0B9AEC;
+  box-shadow: 0 0 0 3px rgba(11, 154, 236, 0.15);
+}
+
+/* ---- Tabs (anchor-link style: active underlined, hover azure) ---- */
+.tab {
+  padding: 12px 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 450;
+  color: #636B71;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color var(--motion-standard), border-color var(--motion-standard);
+}
+
+.tab:hover {
+  color: #0B9AEC;
+}
+
+.tab.active {
+  color: #013A68;
+  font-weight: 650;
+  border-bottom-color: #0B9AEC;
+}
+
+/* ---- Status badges (CDL semantic colors) ---- */
+.badge {
+  display: inline-block;
+  border-radius: 12px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.badge-draft    { background: #EEF3F7; color: #636B71; }
+.badge-sent     { background: #FFF4E3; color: #C97502; }
+.badge-approved { background: #E6F7ED; color: #1AAA55; }
+.badge-rejected { background: #FBEAE7; color: #DB3B21; }
+.badge-sap      { background: #E7F5FE; color: #016ABD; }
+.badge-po       { background: #013A68; color: white; }
+
+/* ---- Language selector (sidebar, dark surface) ---- */
+.lang-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  color: #9CC9E8;
+  font-size: 12px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: color var(--motion-standard), border-color var(--motion-standard), background var(--motion-standard);
+}
+
+.lang-select:hover {
+  color: white;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.lang-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #DAE5EE;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 8px 24px rgba(1, 58, 104, 0.25);
+  z-index: 50;
+  animation: cdl-rise 300ms var(--ease-out-quart) both;
+}
+
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: #013A68;
+  font-size: 12px;
+  font-weight: 450;
+  cursor: pointer;
+  transition: background var(--motion-standard), color var(--motion-standard);
+}
+
+.lang-option:hover {
+  background: #EEF3F7;
+}
+
+.lang-option.active {
+  background: #E7F5FE;
+  color: #016ABD;
+  font-weight: 650;
+}
+
+/* ---- Table ---- */
+.table-head th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 11px;
+  color: #636B71;
+  font-weight: 650;
+  background: #EEF3F7; /* Grey 100 — CDL "Title on $grey100" cell style */
+  border-bottom: 1px solid #DAE5EE;
+  white-space: nowrap;
+}
+
+/* Horizontal scroll containers: scrollbar always visible per CDL */
+.table-scroll {
+  overflow-x: scroll;
+}

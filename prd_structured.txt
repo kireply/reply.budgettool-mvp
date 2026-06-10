@@ -1,0 +1,324 @@
+BUDGET TOOL MVP
+Product Requirements Document & Action Plan
+Cliente: A2A  |  Fornitore: Reply  |  Versione: 1.0  |  Data: Giugno 2025
+1. Contesto e Obiettivi
+A2A necessita di uno strumento unico per la gestione del budget societario IT, che sostituisca l'attuale processo manuale basato su fogli Excel condivisi e processi non tracciati. Il tool dovrà supportare l'intero ciclo di vita del budget: dalla raccolta delle esigenze delle diverse linee di business, all'aggregazione gerarchica, fino alla gestione delle purchase request e alla reportistica avanzata.
+Problema attuale
+• Gestione budget su Excel condivisi ('tabellone') con rischio di conflitti e dati non allineati
+• Nessuna tracciabilità della relazione tra pianificato, impegnato e consuntivato
+• Processo di riallocazione manuale e non governato
+• Reportistica aggregata difficoltosa e time-consuming
+• Nessuna integrazione con SAP per PR/PO (obiettivo futuro)
+Obiettivo strategico del prototipo
+• Dimostrare ad A2A la comprensione delle loro esigenze e la velocità esecutiva di Reply
+• Mostrare 2-3 funzionalità chiave calate sul contesto A2A
+• Validare i requisiti prima dello sviluppo completo
+• Adottare le style guide A2A per un risultato visivamente coerente
+2. Stakeholder e Utenti
+2.1 Stakeholder lato cliente
+Ruolo
+Nome
+Interesse
+IT Governance / Responsabile Budget
+Roberta (tbc)
+Gestione e controllo budget IT complessivo
+IT Manager / Responsabile WBS
+Vari manager
+Inserimento costi, creazione PR, riallocazioni
+CIO
+–
+Approvazione PR oltre soglia, visibilità spending
+Procurement
+–
+Validazione PR su contratti quadro, creazione PO
+Finance / Controlling
+–
+Allineamento con SAP, scenario di budget su Tagetik
+Referente tecnico A2A
+Maccarini Luca, Tivegna Simone
+Requisiti tecnici, integrazione SAP, modello WBS
+2.2 Stakeholder lato Reply
+Ruolo
+Nome
+Project Sponsor / Validatore MVP
+Andrea Chiarentin
+Developer / Responsabile MVP
+Paolo Sangalli
+UX / Style Guide A2A
+Gabriele Gimelli
+Esperto funzionale (demo precedente)
+Ivan Frisicaro
+3. Requisiti Funzionali
+3.1 Modulo WBS e Gestione Costi (PRIORITÀ ALTA – MVP)
+La WBS (Work Breakdown Structure) è il fulcro del sistema. Ogni WBS rappresenta un'iniziativa, un progetto o una voce di budget assegnata a un responsabile, con associati centro di costo, voce di costo, legal entity e fornitori.
+Creazione e gestione WBS
+Operazioni: creazione, copia, modifica, ricerca, eliminazione, export
+Campi principali: codice WBS, nome, responsabile, centro di costo, legal entity, fornitore, anno di riferimento
+Struttura gerarchica: possibilità di aggregare WBS in iniziative multi-WBS
+Validazione unicità codice WBS (con eventuale collegamento a SAP code in futuro)
+Inserimento costi per scenario (versioni)
+Ogni WBS supporta più scenari economici (es. Budget Iniziale, Rolling, Forecast)
+Distribuzione mensile del budget per voce di costo
+Classificazione Opex / Capex con gestione pluriennale per Capex
+Confronto tra scenari: Budget vs Rolling vs Actual
+Distribuzione mensile (WBS Monthly Distribution)
+Calendaring: il responsabile distribuisce il budget pianificato mese per mese
+Blocco del mese passato una volta trasmesso a SAP
+3.2 Processo di Budgeting e Validazione (PRIORITÀ ALTA – MVP)
+Il processo di budgeting segue un ciclo iterativo con almeno due 'giri' di raccolta, validazione e riaggregazione prima della chiusura (tipicamente gennaio-febbraio).
+Budget Entry: ogni IT manager inserisce il budget per il proprio perimetro WBS
+Budget Validation: validazione automatica o manuale da parte di un approvatore sulla base di regole configurabili (es. limiti di pianificazione, confronto con spending storico)
+Attivazione Rolling: conversione dello scenario di budget in Rolling attivo, utilizzabile per le PR
+Scenari economici multipli: Budget, Rolling, Forecast, Actual (da SAP in futuro)
+Confronto triennale: richiesta corrente vs spending anno precedente vs forecast anno successivo
+Bilanciamento inter-area: visibilità su surplus e deficit tra aree per compensazioni
+3.3 Riallocazioni / Planning (PRIORITÀ ALTA – MVP)
+Durante l'anno in corso è possibile richiedere spostamenti di budget tra WBS o tra voci di costo (riallocazioni).
+Reallocation Request: il manager richiede uno spostamento di budget
+Reallocation Execution: approvazione e applicazione sul scenario Rolling
+Regole configurabili: soglie massime per utente, limiti per area
+Approvazione delle riallocazioni: step approvativo opzionale se si superano i limiti
+Tracciabilità: storico di tutte le variazioni con motivazione e approvatore
+3.4 Purchase Request Management (PRIORITÀ ALTA – MVP)
+Una volta attivo il Rolling, i manager possono creare Purchase Request (PR) attingendo dal budget disponibile sulla WBS.
+Creazione PR
+Campi: WBS di riferimento, voce di costo, fornitore (anche TBD), importo, posizioni
+Verifica disponibilità budget in tempo reale prima della creazione
+Possibilità di PR multi-posizione su più WBS (con regole di coerenza configurabili)
+Gestione fornitore: Supplier richiesto (PR) vs Supplier finale (PO)
+Workflow approvativo PR
+Flusso configurabile: creatore → responsabile WBS → CIO
+Soglie di approvazione automatica: PR sotto soglia configurabile → approvazione automatica
+Deleghe (Delegated of Authority): possibilità di delegare operazioni
+Notifiche email (funzionalità avanzata, non obbligatoria per MVP)
+Ciclo PR → PO
+Stato PR: Bozza → Inviata → Approvata → Inviata a SAP → PO Creato
+Gestione efficienza: se PO < PR, il residuo ritorna sulla WBS o abbassa il budget
+Contract Management (funzionalità avanzata)
+Collegamento PR a contratti quadro disponibili
+Erosione del disponibile contrattuale per figura professionale
+3.5 Reportistica Avanzata (PRIORITÀ ALTA – MVP)
+La reportistica è uno degli elementi chiave richiesti da A2A: visibilità completa su pianificato vs impegnato vs consuntivato.
+Dashboard principale: pianificato vs impegnato per area / WBS / voce di costo
+Drill-down: da vista consolidata top-level fino al dettaglio singola WBS
+Viste per aggregazione: per area organizzativa, centro di costo, legal entity, fornitore
+Confronto scenari: Budget iniziale vs Rolling vs Forecast vs Actual
+Tracciabilità PR/PO: stato avanzamento ordini, importi impegnati, residuo disponibile
+Export dati: Excel/CSV per riconciliazione manuale con Tagetik (sistema A2A attuale)
+3.6 Funzionalità Avanzate (Fuori Scope MVP – Roadmap)
+Funzionalità
+Priorità
+Note
+Integrazione SAP (PR/PO automatica)
+Alta – post MVP
+Tramite SFTP/transazione custom o BAPI
+Integrazione Tagetik (budget consolidato)
+Alta – post MVP
+A2A usa Tagetik come sistema di pianificazione centrale
+Approvazione PR via email
+Media
+Risposta diretta da client di posta
+Creazione automatica entrate merci (SAP)
+Media
+Pianificazione e trasmissione automatica a SAP
+Contract Management completo
+Media
+Gestione contratti quadro con figure professionali
+RPA per allineamento WBS su SAP
+Bassa – dipende da modello controllo A2A
+In corso revisione modello di controlling SAP
+App mobile
+Bassa
+–
+4. Scope MVP — Prototipo per Validazione
+L'MVP deve dimostrare comprensione del dominio A2A e velocità esecutiva. Si concentra su 3 funzionalità chiave, visivamente coerenti con le style guide A2A.
+Funzionalità MVP (3 core modules)
+MODULE 1 — WBS + Inserimento Costi
+  • Lista WBS con filtri (area, anno, responsabile, stato)
+  • Dettaglio WBS: dati anagrafici + distribuzione costi mensile per scenario
+  • Comparazione Budget vs Rolling per WBS selezionata
+MODULE 2 — Purchase Request (flusso base)
+  • Creazione PR: selezione WBS, voce di costo, importo, fornitore
+  • Verifica disponibilità budget in tempo reale
+  • Stato PR con workflow semplificato (Bozza → Approvata)
+MODULE 3 — Dashboard Reportistica
+  • Vista aggregata: Pianificato vs Impegnato per area
+  • Grafico bar/donut per distribuzione spesa
+  • Tabella drill-down per WBS con stato PR associate
+Stack tecnologico consigliato per MVP:
+Frontend: React + Tailwind CSS (o framework stilistico A2A da Figma di Gabriele Gimelli)
+Backend/Mock: dati statici JSON o API mock (no integrazione SAP per MVP)
+Deploy: Vercel o GitHub Pages per accessibilità immediata
+Implementazione: Claude Code (cloud code) per fast prototyping
+5. Non Requisiti (Esplicitamente Esclusi dall'MVP)
+Integrazione SAP reale
+Autenticazione utenti e gestione permessi
+Persistenza dati su database (dati mock/statici)
+Approvazione via email
+Contract management
+Gestione entrate merci
+Multi-tenant / multi-azienda
+6. Criteri di Accettazione MVP
+Funzionalità
+Criterio di accettazione
+WBS List
+Visualizzazione lista WBS con almeno 5 campi e filtro per area/anno
+WBS Detail
+Tabella costi mensile con almeno 2 scenari (Budget e Rolling) comparati
+PR Creation
+Form di creazione PR con verifica disponibilità e cambio stato
+Dashboard
+Grafico pianificato vs impegnato con drill-down per WBS
+Style Guide
+UI coerente con palette e font A2A (Figma da Gabriele)
+Deploy
+Prototipo accessibile via URL (Vercel / GitHub Pages)
+7. Action Plan — Roadmap verso il Meeting di Venerdì
+#
+Attività
+Responsabile
+Priorità
+Status
+1
+Leggere e analizzare tutti i materiali (presentazione Reply, transcript, recap TXT)
+Paolo
+CRITICA
+✓ Completato
+2
+Redigere PRD essenziale con funzionalità MVP
+Paolo
+CRITICA
+In corso
+3
+Preparare 2-3 slide di validazione (alberatura + scope MVP) → invio ad Andrea
+Paolo
+CRITICA
+TBD
+4
+Validare slide e scope MVP
+Andrea
+CRITICA
+TBD
+5
+Contattare Gabriele Gimelli per style guide A2A (Figma)
+Paolo
+ALTA
+TBD
+6
+Implementare MODULE 1: WBS + Inserimento Costi
+Paolo
+ALTA
+TBD
+7
+Implementare MODULE 2: Purchase Request flow base
+Paolo
+ALTA
+TBD
+8
+Implementare MODULE 3: Dashboard Reportistica
+Paolo
+ALTA
+TBD
+9
+Applicare style guide A2A all'MVP
+Paolo
+ALTA
+TBD
+10
+Deploy su Vercel / GitHub Pages + generare URL condivisibile
+Paolo
+ALTA
+TBD
+11
+Creare cartella condivisa 'presentazione prototipo'
+Andrea
+MEDIA
+TBD
+12
+Caricare slide + link prototipo nella cartella condivisa
+Paolo
+MEDIA
+TBD
+13
+Meeting di presentazione MVP ad A2A (venerdì)
+Andrea + Paolo
+CRITICA
+TBD
+8. Domande Aperte e Rischi
+8.1 Domande da chiarire con A2A
+Come è strutturato il modello WBS attuale in A2A? Esiste già una gerarchia in SAP o è da costruire?
+Qual è la relazione esatta tra gli ID di budget A2A e le WBS in SAP? (Tivegna ha sollevato il punto)
+Il budget IT viaggia su Tagetik: come si integra il Budget Tool con Tagetik? (input/output?)
+Chi sono gli utenti finali del tool? Solo IT Governance (Roberta) o anche i singoli IT manager?
+Esistono soglie approvative predefinite per le PR? (es. PR > 50.000€ → approvazione CIO)
+Il Procurement di A2A partecipa al processo di PR/PO come in CNH/Iveco?
+Qual è il calendario di budgeting A2A? (chiusura gennaio-febbraio come standard?)
+8.2 Rischi identificati
+Rischio
+Impatto
+Mitigazione
+Style guide A2A non disponibili in tempo
+Alto
+Usare palette neutra/professionale come fallback; contattare Gabriele subito
+Scope creep: A2A chiede funzionalità non previste nell'MVP
+Medio
+Allineare aspettative su cosa è MVP vs roadmap
+Modello WBS A2A non mappabile su asset Reply senza customizzazione significativa
+Alto
+Workshop dedicato post-MVP per gap analysis
+Integrazione SAP richiesta prima del previsto
+Medio
+Chiarire che l'MVP è un prototipo UI/UX, non un sistema di produzione
+9. Idee per le Slide di Pre-Validazione
+Prima di sviluppare l'MVP, preparare 2-3 slide da condividere con Andrea (e poi A2A) per validare lo scope. Di seguito le idee per ogni slide:
+SLIDE 1 — Architettura Funzionale dell'Applicazione
+Obiettivo: mostrare la 'mappa' dei moduli del Budget Tool e come si relazionano tra loro.
+Contenuto suggerito
+• Diagramma a blocchi con i 5 moduli principali:
+  ① WBS Management  ② Budget & Scenari  ③ Planning & Riallocazioni  ④ Purchase Request  ⑤ Reportistica
+• Frecce che mostrano il flusso: Budget Entry → Validazione → Rolling → PR → PO → Report
+• Box laterale con le funzionalità avanzate (future): SAP Integration, Email Approval, Contract Mgmt
+• Indicazione visiva di cosa è IN SCOPE per l'MVP (highlight verde) vs roadmap (grigio)
+SLIDE 2 — Scope dell'MVP: 3 Funzionalità Chiave
+Obiettivo: essere cristallini su cosa sarà visibile nel prototipo di venerdì.
+Contenuto suggerito
+• 3 card affiancate, una per modulo MVP:
+  CARD 1: WBS + Costi — 'Gestisci il tuo budget per WBS, per scenario e per mese'
+  CARD 2: Purchase Request — 'Crea una PR verificando la disponibilità in tempo reale'
+  CARD 3: Dashboard — 'Confronta Pianificato vs Impegnato con drill-down per area'
+• Per ogni card: 1 screenshot wireframe/mockup + 2-3 bullet di funzionalità
+• Nota in basso: 'Il prototipo adotta le style guide A2A ed è deployato su [URL]'
+SLIDE 3 — Come Lavoriamo: Fast Prototyping Powered by Cloud Code
+Obiettivo: comunicare il metodo di lavoro Reply — iterazioni rapide, MVP in ore, non settimane.
+Contenuto suggerito
+• Timeline visiva (oggi → venerdì):
+  Giorno 1: Analisi requisiti + PRD  →  Giorno 2: Implementazione  →  Giorno 3: Deploy + Feedback
+• Citazione chiave: 'Da requisiti a prototipo in 48 ore, grazie a Claude Code'
+• Prossimi passi proposti dopo la demo:
+  ① Workshop su processi attuali A2A (gap analysis)
+  ② Definizione timeline e deployment plan completo
+  ③ Pilot su perimetro limitato (es. 1 area IT)
+10. Glossario
+Termine
+Definizione nel contesto A2A
+WBS (Work Breakdown Structure)
+Struttura di scomposizione del lavoro/budget: unità base di gestione del budget IT, associata a un responsabile, centro di costo e voce di costo
+Rolling
+Scenario di budget attivo, convertito dal budget validato e utilizzato per la creazione delle PR durante l'anno
+PR (Purchase Request)
+Richiesta di acquisto creata dal manager a valere sul budget disponibile di una WBS
+PO (Purchase Order)
+Ordine di acquisto generato dopo approvazione della PR, tipicamente creato su SAP
+Impegnato
+Importo già vincolato da PR/PO approvati, non ancora fatturato
+Pianificato
+Importo di budget allocato nello scenario Rolling per una WBS
+Actual / Consuntivato
+Importo effettivamente speso (fatturato e pagato), proviene da SAP
+Riallocazione
+Spostamento di budget da una WBS a un'altra o tra voci di costo all'interno dello scenario Rolling
+Tagetik
+Sistema di pianificazione e consolidamento finanziario usato da A2A (non SAP)
+DOA (Delegated of Authority)
+Sistema di deleghe operative: un utente può operare per conto di un altro entro limiti definiti
+Documento preparato da Reply per A2A — Versione 1.0 — Giugno 2025 — Confidenziale
