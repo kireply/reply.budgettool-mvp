@@ -21,14 +21,14 @@ export const translations: Record<Lang, Record<string, string>> = {
   it: {
     // Layout
     'layout.subtitle': 'Budget Tool',
-    'layout.year': 'Anno: 2025',
+    'layout.year': 'Anno: 2026',
     'layout.mainMenu': 'Menu principale',
     'nav.dashboard': 'Dashboard',
     'nav.wbs': 'Gestione WBS',
     'nav.pr': 'Purchase Request',
     'nav.report': 'Reportistica',
     'nav.settings': 'Impostazioni',
-    'layout.topbar': 'Budget IT 2025 — Gestione e controllo',
+    'layout.topbar': 'Budget IT 2026 — Gestione e controllo',
     'layout.poweredBy': 'Reply per A2A',
     'layout.language': 'Lingua',
     'layout.resetData': 'Ripristina dati demo',
@@ -58,7 +58,7 @@ export const translations: Record<Lang, Record<string, string>> = {
 
     // Shared KPI labels
     'kpi.totalBudget': 'Budget Totale',
-    'kpi.budgetScenario': 'Scenario Budget 2025',
+    'kpi.budgetScenario': 'Scenario Budget 2026',
     'kpi.activeRolling': 'Rolling Attivo',
     'kpi.vsBudget': '+{pct}% vs budget',
     'kpi.committed': 'Impegnato (PR/PO)',
@@ -109,8 +109,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     'th.prTot': 'PR tot',
 
     // Dashboard
-    'dash.title': 'Dashboard Budget IT 2025',
-    'dash.subtitle': 'Panoramica pianificato vs impegnato per area · Dati aggiornati a Maggio 2025',
+    'dash.title': 'Dashboard Budget IT 2026',
+    'dash.subtitle': 'Panoramica pianificato vs impegnato per area · Dati aggiornati a Maggio 2026',
     'dash.chartPlannedCommitted': 'Pianificato vs Impegnato per Area',
     'dash.drillActive': 'Drill-down attivo:',
     'dash.rollingDistribution': 'Distribuzione Rolling per Area',
@@ -190,7 +190,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'wnew.subtitle': 'Creazione di una nuova Work Breakdown Structure con voci di costo e distribuzione mensile',
     'wnew.nome': 'Nome iniziativa *',
     'wnew.nomePh': 'Es: Migrazione Data Center',
-    'wnew.codicePh': 'Es: IT-2025-009',
+    'wnew.codicePh': 'Es: IT-2026-009',
     'wnew.responsabilePh': 'Es: Mario Rossi',
     'wnew.centroCostoPh': 'Es: CC-IT-009',
     'wnew.area': 'Area *',
@@ -236,14 +236,14 @@ export const translations: Record<Lang, Record<string, string>> = {
   en: {
     // Layout
     'layout.subtitle': 'Budget Tool',
-    'layout.year': 'Year: 2025',
+    'layout.year': 'Year: 2026',
     'layout.mainMenu': 'Main menu',
     'nav.dashboard': 'Dashboard',
     'nav.wbs': 'WBS Management',
     'nav.pr': 'Purchase Request',
     'nav.report': 'Reporting',
     'nav.settings': 'Settings',
-    'layout.topbar': 'IT Budget 2025 — Management and control',
+    'layout.topbar': 'IT Budget 2026 — Management and control',
     'layout.poweredBy': 'Reply for A2A',
     'layout.language': 'Language',
     'layout.resetData': 'Reset demo data',
@@ -273,7 +273,7 @@ export const translations: Record<Lang, Record<string, string>> = {
 
     // Shared KPI labels
     'kpi.totalBudget': 'Total Budget',
-    'kpi.budgetScenario': 'Budget 2025 scenario',
+    'kpi.budgetScenario': 'Budget 2026 scenario',
     'kpi.activeRolling': 'Active Rolling',
     'kpi.vsBudget': '+{pct}% vs budget',
     'kpi.committed': 'Committed (PR/PO)',
@@ -324,8 +324,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     'th.prTot': 'Total PRs',
 
     // Dashboard
-    'dash.title': 'IT Budget 2025 Dashboard',
-    'dash.subtitle': 'Planned vs committed overview by area · Data updated as of May 2025',
+    'dash.title': 'IT Budget 2026 Dashboard',
+    'dash.subtitle': 'Planned vs committed overview by area · Data updated as of May 2026',
     'dash.chartPlannedCommitted': 'Planned vs Committed by Area',
     'dash.drillActive': 'Active drill-down:',
     'dash.rollingDistribution': 'Rolling Distribution by Area',
@@ -405,7 +405,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'wnew.subtitle': 'Create a new Work Breakdown Structure with cost items and monthly distribution',
     'wnew.nome': 'Initiative name *',
     'wnew.nomePh': 'E.g. Data Center Migration',
-    'wnew.codicePh': 'E.g. IT-2025-009',
+    'wnew.codicePh': 'E.g. IT-2026-009',
     'wnew.responsabilePh': 'E.g. Mario Rossi',
     'wnew.centroCostoPh': 'E.g. CC-IT-009',
     'wnew.area': 'Area *',
@@ -451,14 +451,14 @@ export const translations: Record<Lang, Record<string, string>> = {
   fr: {
     // Layout
     'layout.subtitle': 'Budget Tool',
-    'layout.year': 'Année : 2025',
+    'layout.year': 'Année : 2026',
     'layout.mainMenu': 'Menu principal',
     'nav.dashboard': 'Tableau de bord',
     'nav.wbs': 'Gestion WBS',
     'nav.pr': 'Purchase Request',
     'nav.report': 'Rapports',
     'nav.settings': 'Paramètres',
-    'layout.topbar': 'Budget IT 2025 — Gestion et contrôle',
+    'layout.topbar': 'Budget IT 2026 — Gestion et contrôle',
     'layout.poweredBy': 'Reply pour A2A',
     'layout.language': 'Langue',
     'layout.resetData': 'Réinitialiser les données démo',
@@ -488,7 +488,7 @@ export const translations: Record<Lang, Record<string, string>> = {
 
     // Shared KPI labels
     'kpi.totalBudget': 'Budget total',
-    'kpi.budgetScenario': 'Scénario Budget 2025',
+    'kpi.budgetScenario': 'Scénario Budget 2026',
     'kpi.activeRolling': 'Rolling actif',
     'kpi.vsBudget': '+{pct}% vs budget',
     'kpi.committed': 'Engagé (PR/PO)',
@@ -539,8 +539,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     'th.prTot': 'Total PR',
 
     // Dashboard
-    'dash.title': 'Tableau de bord Budget IT 2025',
-    'dash.subtitle': 'Vue planifié vs engagé par domaine · Données mises à jour en mai 2025',
+    'dash.title': 'Tableau de bord Budget IT 2026',
+    'dash.subtitle': 'Vue planifié vs engagé par domaine · Données mises à jour en mai 2026',
     'dash.chartPlannedCommitted': 'Planifié vs Engagé par domaine',
     'dash.drillActive': 'Drill-down actif :',
     'dash.rollingDistribution': 'Répartition du Rolling par domaine',
@@ -620,7 +620,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'wnew.subtitle': 'Création d’une nouvelle Work Breakdown Structure avec postes de coût et répartition mensuelle',
     'wnew.nome': 'Nom de l’initiative *',
     'wnew.nomePh': 'Ex. : Migration Data Center',
-    'wnew.codicePh': 'Ex. : IT-2025-009',
+    'wnew.codicePh': 'Ex. : IT-2026-009',
     'wnew.responsabilePh': 'Ex. : Mario Rossi',
     'wnew.centroCostoPh': 'Ex. : CC-IT-009',
     'wnew.area': 'Domaine *',
@@ -666,14 +666,14 @@ export const translations: Record<Lang, Record<string, string>> = {
   de: {
     // Layout
     'layout.subtitle': 'Budget Tool',
-    'layout.year': 'Jahr: 2025',
+    'layout.year': 'Jahr: 2026',
     'layout.mainMenu': 'Hauptmenü',
     'nav.dashboard': 'Dashboard',
     'nav.wbs': 'WBS-Verwaltung',
     'nav.pr': 'Purchase Request',
     'nav.report': 'Berichte',
     'nav.settings': 'Einstellungen',
-    'layout.topbar': 'IT-Budget 2025 — Verwaltung und Kontrolle',
+    'layout.topbar': 'IT-Budget 2026 — Verwaltung und Kontrolle',
     'layout.poweredBy': 'Reply für A2A',
     'layout.language': 'Sprache',
     'layout.resetData': 'Demodaten zurücksetzen',
@@ -703,7 +703,7 @@ export const translations: Record<Lang, Record<string, string>> = {
 
     // Shared KPI labels
     'kpi.totalBudget': 'Gesamtbudget',
-    'kpi.budgetScenario': 'Szenario Budget 2025',
+    'kpi.budgetScenario': 'Szenario Budget 2026',
     'kpi.activeRolling': 'Aktives Rolling',
     'kpi.vsBudget': '+{pct}% vs. Budget',
     'kpi.committed': 'Gebunden (PR/PO)',
@@ -754,8 +754,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     'th.prTot': 'PR gesamt',
 
     // Dashboard
-    'dash.title': 'IT-Budget 2025 Dashboard',
-    'dash.subtitle': 'Übersicht geplant vs. gebunden nach Bereich · Datenstand Mai 2025',
+    'dash.title': 'IT-Budget 2026 Dashboard',
+    'dash.subtitle': 'Übersicht geplant vs. gebunden nach Bereich · Datenstand Mai 2026',
     'dash.chartPlannedCommitted': 'Geplant vs. Gebunden nach Bereich',
     'dash.drillActive': 'Aktiver Drill-down:',
     'dash.rollingDistribution': 'Rolling-Verteilung nach Bereich',
@@ -835,7 +835,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'wnew.subtitle': 'Erstellung einer neuen Work Breakdown Structure mit Kostenpositionen und monatlicher Verteilung',
     'wnew.nome': 'Name der Initiative *',
     'wnew.nomePh': 'z. B. Rechenzentrumsmigration',
-    'wnew.codicePh': 'z. B. IT-2025-009',
+    'wnew.codicePh': 'z. B. IT-2026-009',
     'wnew.responsabilePh': 'z. B. Mario Rossi',
     'wnew.centroCostoPh': 'z. B. CC-IT-009',
     'wnew.area': 'Bereich *',

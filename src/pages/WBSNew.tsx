@@ -36,7 +36,7 @@ export default function WBSNew() {
 
   const [form, setForm] = useState({
     codice: '', nome: '', area: '', responsabile: '',
-    centroCosto: '', legalEntity: '', fornitore: '', anno: '2025',
+    centroCosto: '', legalEntity: '', fornitore: '', anno: String(new Date().getFullYear()),
   });
   const [rows, setRows] = useState<CostRow[]>([emptyRow()]);
   const [touched, setTouched] = useState<Record<string, boolean>>({});

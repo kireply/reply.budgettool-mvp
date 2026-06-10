@@ -69,14 +69,14 @@ function monthlySpread(total: number, variance = 0.2): MonthlyData[] {
 export const wbsData: WBS[] = [
   {
     id: 'wbs-001',
-    codice: 'IT-2025-001',
+    codice: 'IT-2026-001',
     nome: 'Infrastruttura Cloud AWS',
     responsabile: 'Marco Bianchi',
     area: 'IT Infrastructure',
     centroCosto: 'CC-IT-001',
     legalEntity: 'A2A S.p.A.',
     fornitore: 'Amazon Web Services',
-    anno: 2025,
+    anno: 2026,
     stato: 'Attiva',
     budgetTotale: 480000,
     rollingTotale: 504000,
@@ -90,14 +90,14 @@ export const wbsData: WBS[] = [
   },
   {
     id: 'wbs-002',
-    codice: 'IT-2025-002',
+    codice: 'IT-2026-002',
     nome: 'Progetto SAP S/4HANA Migration',
     responsabile: 'Laura Verdi',
     area: 'Application Management',
     centroCosto: 'CC-IT-002',
     legalEntity: 'A2A S.p.A.',
     fornitore: 'SAP Italia',
-    anno: 2025,
+    anno: 2026,
     stato: 'Attiva',
     budgetTotale: 750000,
     rollingTotale: 787500,
@@ -111,14 +111,14 @@ export const wbsData: WBS[] = [
   },
   {
     id: 'wbs-003',
-    codice: 'IT-2025-003',
+    codice: 'IT-2026-003',
     nome: 'Sicurezza Informatica & SOC',
     responsabile: 'Alessandro Neri',
     area: 'Cybersecurity',
     centroCosto: 'CC-IT-003',
     legalEntity: 'A2A S.p.A.',
     fornitore: 'Leonardo S.p.A.',
-    anno: 2025,
+    anno: 2026,
     stato: 'Attiva',
     budgetTotale: 320000,
     rollingTotale: 336000,
@@ -132,14 +132,14 @@ export const wbsData: WBS[] = [
   },
   {
     id: 'wbs-004',
-    codice: 'IT-2025-004',
+    codice: 'IT-2026-004',
     nome: 'Digital Workplace & Collaboration',
     responsabile: 'Francesca Romano',
     area: 'Digital Workplace',
     centroCosto: 'CC-IT-004',
     legalEntity: 'A2A Energia S.r.l.',
     fornitore: 'Microsoft Italia',
-    anno: 2025,
+    anno: 2026,
     stato: 'Attiva',
     budgetTotale: 210000,
     rollingTotale: 220500,
@@ -153,14 +153,14 @@ export const wbsData: WBS[] = [
   },
   {
     id: 'wbs-005',
-    codice: 'IT-2025-005',
+    codice: 'IT-2026-005',
     nome: 'Data Platform & Analytics',
     responsabile: 'Stefano Conti',
     area: 'Data & Analytics',
     centroCosto: 'CC-IT-005',
     legalEntity: 'A2A Smart City S.r.l.',
     fornitore: 'Capgemini Italia',
-    anno: 2025,
+    anno: 2026,
     stato: 'Attiva',
     budgetTotale: 560000,
     rollingTotale: 588000,
@@ -174,14 +174,14 @@ export const wbsData: WBS[] = [
   },
   {
     id: 'wbs-006',
-    codice: 'IT-2025-006',
+    codice: 'IT-2026-006',
     nome: 'Network & Connettività',
     responsabile: 'Roberto Esposito',
     area: 'IT Infrastructure',
     centroCosto: 'CC-IT-001',
     legalEntity: 'A2A S.p.A.',
     fornitore: 'TIM Enterprise',
-    anno: 2025,
+    anno: 2026,
     stato: 'Sospesa',
     budgetTotale: 180000,
     rollingTotale: 189000,
@@ -196,46 +196,46 @@ export const wbsData: WBS[] = [
 
 export const purchaseRequests: PurchaseRequest[] = [
   {
-    id: 'pr-001', numero: 'PR-2025-0001',
-    wbsId: 'wbs-001', wbsCodice: 'IT-2025-001', wbsNome: 'Infrastruttura Cloud AWS',
+    id: 'pr-001', numero: 'PR-2026-0001',
+    wbsId: 'wbs-001', wbsCodice: 'IT-2026-001', wbsNome: 'Infrastruttura Cloud AWS',
     voceCosto: 'Servizi Cloud', fornitore: 'Amazon Web Services',
     importo: 85000, stato: 'Approvata',
-    creatore: 'Marco Bianchi', dataCreazione: '2025-02-15', note: 'Rinnovo contratto AWS EC2 - Q1'
+    creatore: 'Marco Bianchi', dataCreazione: '2026-02-15', note: 'Rinnovo contratto AWS EC2 - Q1'
   },
   {
-    id: 'pr-002', numero: 'PR-2025-0002',
-    wbsId: 'wbs-002', wbsCodice: 'IT-2025-002', wbsNome: 'Progetto SAP S/4HANA Migration',
+    id: 'pr-002', numero: 'PR-2026-0002',
+    wbsId: 'wbs-002', wbsCodice: 'IT-2026-002', wbsNome: 'Progetto SAP S/4HANA Migration',
     voceCosto: 'Consulenza Esterna', fornitore: 'SAP Italia',
     importo: 150000, stato: 'Inviata a SAP',
-    creatore: 'Laura Verdi', dataCreazione: '2025-03-01', note: 'Fase 1 implementazione FICO'
+    creatore: 'Laura Verdi', dataCreazione: '2026-03-01', note: 'Fase 1 implementazione FICO'
   },
   {
-    id: 'pr-003', numero: 'PR-2025-0003',
-    wbsId: 'wbs-003', wbsCodice: 'IT-2025-003', wbsNome: 'Sicurezza Informatica & SOC',
+    id: 'pr-003', numero: 'PR-2026-0003',
+    wbsId: 'wbs-003', wbsCodice: 'IT-2026-003', wbsNome: 'Sicurezza Informatica & SOC',
     voceCosto: 'Servizi SOC Gestito', fornitore: 'Leonardo S.p.A.',
     importo: 45000, stato: 'Approvata',
-    creatore: 'Alessandro Neri', dataCreazione: '2025-01-20', note: 'Servizi SOC H1 2025'
+    creatore: 'Alessandro Neri', dataCreazione: '2026-01-20', note: 'Servizi SOC H1 2026'
   },
   {
-    id: 'pr-004', numero: 'PR-2025-0004',
-    wbsId: 'wbs-005', wbsCodice: 'IT-2025-005', wbsNome: 'Data Platform & Analytics',
+    id: 'pr-004', numero: 'PR-2026-0004',
+    wbsId: 'wbs-005', wbsCodice: 'IT-2026-005', wbsNome: 'Data Platform & Analytics',
     voceCosto: 'Data Engineering', fornitore: 'Capgemini Italia',
     importo: 98000, stato: 'Inviata',
-    creatore: 'Stefano Conti', dataCreazione: '2025-04-10', note: 'Sprint 3-4 Data Lake'
+    creatore: 'Stefano Conti', dataCreazione: '2026-04-10', note: 'Sprint 3-4 Data Lake'
   },
   {
-    id: 'pr-005', numero: 'PR-2025-0005',
-    wbsId: 'wbs-004', wbsCodice: 'IT-2025-004', wbsNome: 'Digital Workplace & Collaboration',
+    id: 'pr-005', numero: 'PR-2026-0005',
+    wbsId: 'wbs-004', wbsCodice: 'IT-2026-004', wbsNome: 'Digital Workplace & Collaboration',
     voceCosto: 'Device Management', fornitore: 'TBD',
     importo: 12000, stato: 'Bozza',
-    creatore: 'Francesca Romano', dataCreazione: '2025-05-05', note: 'Acquisto laptop Q2'
+    creatore: 'Francesca Romano', dataCreazione: '2026-05-05', note: 'Acquisto laptop Q2'
   },
   {
-    id: 'pr-006', numero: 'PR-2025-0006',
-    wbsId: 'wbs-002', wbsCodice: 'IT-2025-002', wbsNome: 'Progetto SAP S/4HANA Migration',
+    id: 'pr-006', numero: 'PR-2026-0006',
+    wbsId: 'wbs-002', wbsCodice: 'IT-2026-002', wbsNome: 'Progetto SAP S/4HANA Migration',
     voceCosto: 'Formazione', fornitore: 'SAP Italia',
     importo: 25000, stato: 'Rifiutata',
-    creatore: 'Laura Verdi', dataCreazione: '2025-03-20', note: 'Training SAP HANA admin — rifiutata: fuori budget'
+    creatore: 'Laura Verdi', dataCreazione: '2026-03-20', note: 'Training SAP HANA admin — rifiutata: fuori budget'
   },
 ];
 
@@ -243,7 +243,7 @@ export const purchaseRequests: PurchaseRequest[] = [
 // The prototype has no backend: created WBS, created PRs, and PR status changes
 // are persisted to localStorage and rehydrated into the module arrays on load.
 // Bump the version when the seed data above changes shape.
-const STORAGE_KEY = 'a2a-budget-tool-data-v1';
+const STORAGE_KEY = 'a2a-budget-tool-data-v2'; // v2: seed data moved from 2025 to 2026
 
 interface PersistedData {
   wbs: WBS[];
@@ -301,7 +301,7 @@ export function resetDemoData(): void {
 
 // Derived AFTER hydration so persisted entries are included
 export const areas = [...new Set(wbsData.map(w => w.area))];
-export const years = [2024, 2025, 2026];
+export const years = [2025, 2026, 2027];
 export const legalEntities = ['A2A S.p.A.', 'A2A Energia S.r.l.', 'A2A Smart City S.r.l.'];
 
 export const vociCosto = [

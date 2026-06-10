@@ -51,7 +51,7 @@ export default function PurchaseRequests() {
     const wbs = wbsData.find(w => w.id === form.wbsId)!;
     const newPR: PurchaseRequest = {
       id: `pr-${Date.now()}`,
-      numero: `PR-2025-${String(prs.length + 1).padStart(4, '0')}`,
+      numero: `PR-${new Date().getFullYear()}-${String(prs.length + 1).padStart(4, '0')}`,
       wbsId: form.wbsId,
       wbsCodice: wbs.codice,
       wbsNome: wbs.nome,
