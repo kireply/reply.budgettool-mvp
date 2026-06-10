@@ -239,14 +239,70 @@ export const purchaseRequests: PurchaseRequest[] = [
   },
 ];
 
+// ---- Persistence (localStorage) ----
+// The prototype has no backend: created WBS, created PRs, and PR status changes
+// are persisted to localStorage and rehydrated into the module arrays on load.
+// Bump the version when the seed data above changes shape.
+const STORAGE_KEY = 'a2a-budget-tool-data-v1';
+
+interface PersistedData {
+  wbs: WBS[];
+  prs: PurchaseRequest[];
+}
+
+function persist(): void {
+  try {
+    const data: PersistedData = { wbs: wbsData, prs: purchaseRequests };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    // storage full or unavailable: the app keeps working without persistence
+  }
+}
+
+function hydrate(): void {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw) as PersistedData;
+    if (Array.isArray(data.wbs) && Array.isArray(data.prs)) {
+      wbsData.splice(0, wbsData.length, ...data.wbs);
+      purchaseRequests.splice(0, purchaseRequests.length, ...data.prs);
+    }
+  } catch {
+    // corrupted payload: start over from the seed data
+    localStorage.removeItem(STORAGE_KEY);
+  }
+}
+
+hydrate();
+
+export function addWBS(wbs: WBS): void {
+  wbsData.push(wbs);
+  persist();
+}
+
+export function addPurchaseRequest(pr: PurchaseRequest): void {
+  purchaseRequests.unshift(pr);
+  persist();
+}
+
+export function updatePRStatus(id: string, stato: PRStatus): void {
+  const pr = purchaseRequests.find(p => p.id === id);
+  if (pr) {
+    pr.stato = stato;
+    persist();
+  }
+}
+
+export function resetDemoData(): void {
+  localStorage.removeItem(STORAGE_KEY);
+  window.location.reload();
+}
+
+// Derived AFTER hydration so persisted entries are included
 export const areas = [...new Set(wbsData.map(w => w.area))];
 export const years = [2024, 2025, 2026];
 export const legalEntities = ['A2A S.p.A.', 'A2A Energia S.r.l.', 'A2A Smart City S.r.l.'];
-
-// Mock persistence: new WBS live in the module array for the session (no backend)
-export function addWBS(wbs: WBS): void {
-  wbsData.push(wbs);
-}
 
 export const vociCosto = [
   'Licenze Software', 'Servizi Cloud', 'Hardware', 'Consulenza Esterna',

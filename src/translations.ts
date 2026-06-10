@@ -31,6 +31,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     'layout.topbar': 'Budget IT 2025 — Gestione e controllo',
     'layout.poweredBy': 'Reply per A2A',
     'layout.language': 'Lingua',
+    'layout.resetData': 'Ripristina dati demo',
+    'layout.resetConfirm': 'Ripristinare i dati demo? Le WBS e le PR create andranno perse.',
 
     // Common
     'common.reset': 'Reset',
@@ -244,6 +246,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     'layout.topbar': 'IT Budget 2025 — Management and control',
     'layout.poweredBy': 'Reply for A2A',
     'layout.language': 'Language',
+    'layout.resetData': 'Reset demo data',
+    'layout.resetConfirm': 'Reset demo data? Created WBS and PRs will be lost.',
 
     // Common
     'common.reset': 'Reset',
@@ -457,6 +461,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     'layout.topbar': 'Budget IT 2025 — Gestion et contrôle',
     'layout.poweredBy': 'Reply pour A2A',
     'layout.language': 'Langue',
+    'layout.resetData': 'Réinitialiser les données démo',
+    'layout.resetConfirm': 'Réinitialiser les données démo ? Les WBS et PR créées seront perdues.',
 
     // Common
     'common.reset': 'Réinitialiser',
@@ -670,6 +676,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     'layout.topbar': 'IT-Budget 2025 — Verwaltung und Kontrolle',
     'layout.poweredBy': 'Reply für A2A',
     'layout.language': 'Sprache',
+    'layout.resetData': 'Demodaten zurücksetzen',
+    'layout.resetConfirm': 'Demodaten zurücksetzen? Erstellte WBS und PRs gehen verloren.',
 
     // Common
     'common.reset': 'Zurücksetzen',

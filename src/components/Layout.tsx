@@ -1,9 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, FolderKanban, ShoppingCart, BarChart3,
-  Settings, Bell, User
+  Settings, Bell, User, RotateCcw
 } from 'lucide-react';
 import { colors, weight } from '../theme';
+import { resetDemoData } from '../data/mockData';
 import { useI18n } from '../i18n';
 import LanguageSelect from './LanguageSelect';
 
@@ -75,6 +76,13 @@ export default function Layout({ children }: LayoutProps) {
           <Link to="#" className="sidebar-item" style={{ textDecoration: 'none', marginBottom: 4 }}>
             <Settings size={16} /><span>{t('nav.settings')}</span>
           </Link>
+          <button
+            className="sidebar-item"
+            style={{ width: '100%', border: 'none', background: 'none', marginBottom: 4 }}
+            onClick={() => { if (window.confirm(t('layout.resetConfirm'))) resetDemoData(); }}
+          >
+            <RotateCcw size={16} /><span>{t('layout.resetData')}</span>
+          </button>
 
           {/* Language selector */}
           <div style={{ marginTop: 12 }}>

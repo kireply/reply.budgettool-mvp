@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Plus, Search, CheckCircle, XCircle, ArrowRight } from 'lucide-react';
 import {
-  purchaseRequests as initialPRs, wbsData, vociCosto, fornitori,
-  formatCurrency, getStatusColor, type PurchaseRequest, type PRStatus
+  purchaseRequests, wbsData, vociCosto, fornitori,
+  formatCurrency, getStatusColor, addPurchaseRequest, updatePRStatus,
+  type PurchaseRequest, type PRStatus
 } from '../data/mockData';
 import { colors, weight } from '../theme';
 import { useI18n } from '../i18n';
@@ -15,7 +16,8 @@ export default function PurchaseRequests() {
   const [searchParams] = useSearchParams();
   const preselectedWBS = searchParams.get('wbs');
 
-  const [prs, setPrs] = useState<PurchaseRequest[]>(initialPRs);
+  // Local mirror of the persistent store; refreshed after every mutation
+  const [prs, setPrs] = useState<PurchaseRequest[]>(() => [...purchaseRequests]);
   const [showForm, setShowForm] = useState(!!preselectedWBS);
   const [search, setSearch] = useState('');
   const [filterStato, setFilterStato] = useState('');
@@ -61,23 +63,26 @@ export default function PurchaseRequests() {
       dataCreazione: new Date().toISOString().split('T')[0],
       note: form.note,
     };
-    setPrs(prev => [newPR, ...prev]);
+    addPurchaseRequest(newPR);
+    setPrs([...purchaseRequests]);
     setForm({ wbsId: '', voceCosto: '', fornitore: '', importo: '', note: '' });
     setBudgetCheck(null);
     setShowForm(false);
   };
 
   const advanceStatus = (prId: string) => {
-    setPrs(prev => prev.map(p => {
-      if (p.id !== prId) return p;
-      const idx = STATUS_FLOW.indexOf(p.stato);
-      if (idx < STATUS_FLOW.length - 1) return { ...p, stato: STATUS_FLOW[idx + 1] };
-      return p;
-    }));
+    const pr = purchaseRequests.find(p => p.id === prId);
+    if (!pr) return;
+    const idx = STATUS_FLOW.indexOf(pr.stato);
+    if (idx >= 0 && idx < STATUS_FLOW.length - 1) {
+      updatePRStatus(prId, STATUS_FLOW[idx + 1]);
+      setPrs([...purchaseRequests]);
+    }
   };
 
   const rejectPR = (prId: string) => {
-    setPrs(prev => prev.map(p => p.id === prId ? { ...p, stato: 'Rifiutata' as PRStatus } : p));
+    updatePRStatus(prId, 'Rifiutata');
+    setPrs([...purchaseRequests]);
   };
 
   const filtered = prs.filter(p => {
