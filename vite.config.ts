@@ -1,9 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// GitHub Pages serves the app from /<repo-name>/ — the deploy workflow sets DEPLOY_TARGET.
-// Local dev and preview keep the root base.
+// Pages is published with private visibility: GitHub serves it at the root of a
+// dedicated *.pages.github.io subdomain, so the default root base is correct.
 export default defineConfig({
-  base: process.env.DEPLOY_TARGET === 'gh-pages' ? '/a2a.budgettool-mvp/' : '/',
   plugins: [react()],
 })

@@ -10,7 +10,7 @@ import Reportistica from './pages/Reportistica';
 
 export default function App() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+    <BrowserRouter>
       <LanguageProvider>
       <Layout>
         <Routes>
