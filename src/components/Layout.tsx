@@ -24,7 +24,8 @@ export default function Layout({ children }: LayoutProps) {
   const { t } = useI18n();
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: colors.grey100 }}>
+    // Viewport-fixed shell: only <main> scrolls, sidebar and topbar stay put
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: colors.grey100 }}>
       {/* Sidebar — Blue 800 dark surface per CDL */}
       <aside style={{
         width: 248,
@@ -32,6 +33,7 @@ export default function Layout({ children }: LayoutProps) {
         display: 'flex',
         flexDirection: 'column',
         flexShrink: 0,
+        overflowY: 'auto',
       }}>
         {/* Logo */}
         <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
@@ -108,7 +110,7 @@ export default function Layout({ children }: LayoutProps) {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Topbar */}
         <header style={{
-          height: 56, background: 'white',
+          height: 56, flexShrink: 0, background: 'white',
           borderBottom: `1px solid ${colors.grey300}`,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 24px',
