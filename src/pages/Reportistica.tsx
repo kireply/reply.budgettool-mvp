@@ -4,7 +4,8 @@ import {
   Legend, LineChart, Line, CartesianGrid,
 } from 'recharts';
 import { Download, TrendingUp, TrendingDown } from 'lucide-react';
-import { wbsData, purchaseRequests, formatCurrency } from '../data/mockData';
+import { wbsData, purchaseRequests, formatCurrency, impegnatoOf } from '../data/mockData';
+import { downloadCsv } from '../utils/csv';
 import { colors, weight, chartColors } from '../theme';
 import { useI18n } from '../i18n';
 
@@ -18,7 +19,7 @@ export default function Reportistica() {
       if (!acc[w.area]) acc[w.area] = { area: w.area, budget: 0, rolling: 0, impegnato: 0, actual: 0 };
       acc[w.area].budget += w.budgetTotale;
       acc[w.area].rolling += w.rollingTotale;
-      acc[w.area].impegnato += w.impegnato;
+      acc[w.area].impegnato += impegnatoOf(w.id);
       acc[w.area].actual += w.actual;
       return acc;
     }, {} as Record<string, { area: string; budget: number; rolling: number; impegnato: number; actual: number }>)
@@ -48,18 +49,55 @@ export default function Reportistica() {
 
   const totalBudget = wbsData.reduce((s, w) => s + w.budgetTotale, 0);
   const totalRolling = wbsData.reduce((s, w) => s + w.rollingTotale, 0);
-  const totalImpegnato = wbsData.reduce((s, w) => s + w.impegnato, 0);
+  const totalImpegnato = wbsData.reduce((s, w) => s + impegnatoOf(w.id), 0);
   const totalActual = wbsData.reduce((s, w) => s + w.actual, 0);
 
   // Variance analysis
-  const varianceData = wbsData.map(w => ({
-    name: w.codice,
-    fullName: w.nome,
-    delta: w.rollingTotale - w.budgetTotale,
-    pctDelta: Math.round((w.rollingTotale / w.budgetTotale - 1) * 100),
-    impegnato: w.impegnato,
-    disponibile: w.rollingTotale - w.impegnato,
-  }));
+  const varianceData = wbsData.map(w => {
+    const impegnato = impegnatoOf(w.id);
+    return {
+      name: w.codice,
+      fullName: w.nome,
+      delta: w.rollingTotale - w.budgetTotale,
+      pctDelta: Math.round((w.rollingTotale / w.budgetTotale - 1) * 100),
+      impegnato,
+      disponibile: w.rollingTotale - impegnato,
+    };
+  });
+
+  // Export del dataset della vista attiva
+  const handleExport = () => {
+    if (view === 'area') {
+      downloadCsv(
+        'report-aree.csv',
+        [t('th.area'), t('series.budget'), t('series.rolling'), t('series.committed'), t('series.actual')],
+        areaData.map(a => [a.area, a.budget, a.rolling, a.impegnato, a.actual]),
+      );
+    } else if (view === 'wbs') {
+      downloadCsv(
+        'report-scostamenti.csv',
+        [t('th.codice'), t('th.nomeShort'), t('th.budget'), t('th.rolling'), t('th.scostamento'),
+         t('th.pctScost'), t('th.impegnato'), t('th.disponibile'), t('th.prTot')],
+        wbsData.map(w => {
+          const v = varianceData.find(x => x.name === w.codice)!;
+          return [
+            w.codice, w.nome, w.budgetTotale, w.rollingTotale, v.delta, v.pctDelta,
+            v.impegnato, v.disponibile, purchaseRequests.filter(p => p.wbsId === w.id).length,
+          ];
+        }),
+      );
+    } else {
+      downloadCsv(
+        'report-trend.csv',
+        [t('th.mese'), t('series.budget'), t('series.rolling'), t('series.actual'),
+         t('series.budgetCum'), t('series.rollingCum'), t('series.actualCum')],
+        trendData.map((d, i) => [
+          d.month, d.budget, d.rolling, d.actual,
+          cumulativeTrend[i].budget, cumulativeTrend[i].rolling, cumulativeTrend[i].actual,
+        ]),
+      );
+    }
+  };
 
   return (
     <div className="animate-in">
@@ -69,7 +107,7 @@ export default function Reportistica() {
           <p style={{ fontSize: 14, color: colors.grey800 }}>{t('rep.subtitle')}</p>
         </div>
         {/* download icon = file download (CDL semantic icon mapping) */}
-        <button className="btn-secondary">
+        <button className="btn-secondary" onClick={handleExport}>
           <Download size={15} /> {t('rep.export')}
         </button>
       </div>
@@ -197,6 +235,7 @@ export default function Reportistica() {
                 const delta = w.rollingTotale - w.budgetTotale;
                 const pct = Math.round((w.rollingTotale / w.budgetTotale - 1) * 100);
                 const prs = purchaseRequests.filter(p => p.wbsId === w.id);
+                const impegnato = impegnatoOf(w.id);
                 return (
                   <tr key={w.id} style={{ borderBottom: `1px solid ${colors.grey100}` }}>
                     <td style={{ padding: '9px 12px', fontWeight: weight.bold, color: colors.azure600 }}>{w.codice}</td>
@@ -209,9 +248,9 @@ export default function Reportistica() {
                     <td style={{ padding: '9px 12px', color: pct > 0 ? colors.red : colors.green, fontWeight: weight.semibold }}>
                       {pct > 0 ? '+' : ''}{pct}%
                     </td>
-                    <td style={{ padding: '9px 12px', color: colors.orange }}>{formatCurrency(w.impegnato)}</td>
-                    <td style={{ padding: '9px 12px', fontWeight: weight.semibold, color: w.rollingTotale - w.impegnato < 0 ? colors.red : colors.blue800 }}>
-                      {formatCurrency(w.rollingTotale - w.impegnato)}
+                    <td style={{ padding: '9px 12px', color: colors.orange }}>{formatCurrency(impegnato)}</td>
+                    <td style={{ padding: '9px 12px', fontWeight: weight.semibold, color: w.rollingTotale - impegnato < 0 ? colors.red : colors.blue800 }}>
+                      {formatCurrency(w.rollingTotale - impegnato)}
                     </td>
                     <td style={{ padding: '9px 12px' }}>
                       <span style={{ background: colors.azure50, color: colors.blue500, borderRadius: 10, padding: '2px 8px', fontSize: 11, fontWeight: weight.semibold }}>

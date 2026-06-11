@@ -31,9 +31,15 @@ export interface WBS {
   stato: 'Attiva' | 'Chiusa' | 'Sospesa';
   budgetTotale: number;
   rollingTotale: number;
-  impegnato: number;
   actual: number;
   costi: CostEntry[];
+}
+
+export const STATUS_FLOW: PRStatus[] = ['Bozza', 'Inviata', 'Approvata', 'Inviata a SAP', 'PO Creato'];
+
+export interface StatusEvent {
+  stato: PRStatus;
+  data: string;
 }
 
 export interface PurchaseRequest {
@@ -49,6 +55,7 @@ export interface PurchaseRequest {
   creatore: string;
   dataCreazione: string;
   note: string;
+  storia: StatusEvent[];
 }
 
 export const MONTHS = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
@@ -80,7 +87,6 @@ export const wbsData: WBS[] = [
     stato: 'Attiva',
     budgetTotale: 480000,
     rollingTotale: 504000,
-    impegnato: 185000,
     actual: 142000,
     costi: [
       { voce: 'Licenze Software', tipo: 'Opex', budget: 120000, rolling: 126000, actual: 48000, monthly: monthlySpread(120000) },
@@ -101,7 +107,6 @@ export const wbsData: WBS[] = [
     stato: 'Attiva',
     budgetTotale: 750000,
     rollingTotale: 787500,
-    impegnato: 320000,
     actual: 265000,
     costi: [
       { voce: 'Consulenza Esterna', tipo: 'Capex', budget: 450000, rolling: 472500, actual: 187000, monthly: monthlySpread(450000, 0.1) },
@@ -122,7 +127,6 @@ export const wbsData: WBS[] = [
     stato: 'Attiva',
     budgetTotale: 320000,
     rollingTotale: 336000,
-    impegnato: 95000,
     actual: 78000,
     costi: [
       { voce: 'Servizi SOC Gestito', tipo: 'Opex', budget: 180000, rolling: 189000, actual: 58000, monthly: monthlySpread(180000) },
@@ -143,7 +147,6 @@ export const wbsData: WBS[] = [
     stato: 'Attiva',
     budgetTotale: 210000,
     rollingTotale: 220500,
-    impegnato: 82000,
     actual: 67500,
     costi: [
       { voce: 'Microsoft 365', tipo: 'Opex', budget: 120000, rolling: 126000, actual: 50000, monthly: monthlySpread(120000, 0.05) },
@@ -164,7 +167,6 @@ export const wbsData: WBS[] = [
     stato: 'Attiva',
     budgetTotale: 560000,
     rollingTotale: 588000,
-    impegnato: 198000,
     actual: 154000,
     costi: [
       { voce: 'Data Engineering', tipo: 'Capex', budget: 280000, rolling: 294000, actual: 98000, monthly: monthlySpread(280000, 0.15) },
@@ -185,7 +187,6 @@ export const wbsData: WBS[] = [
     stato: 'Sospesa',
     budgetTotale: 180000,
     rollingTotale: 189000,
-    impegnato: 45000,
     actual: 38000,
     costi: [
       { voce: 'Circuiti WAN', tipo: 'Opex', budget: 120000, rolling: 126000, actual: 30000, monthly: monthlySpread(120000, 0.05) },
@@ -194,56 +195,62 @@ export const wbsData: WBS[] = [
   },
 ];
 
+function addDays(iso: string, days: number): string {
+  // tutto in UTC: parse locale + toISOString farebbe slittare la data di un giorno
+  const d = new Date(iso + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().split('T')[0];
+}
+
+// Storia seed: transizioni a pochi giorni di distanza dalla creazione.
+// Una PR Rifiutata segue Bozza → Inviata → Rifiutata; le altre percorrono
+// STATUS_FLOW fino allo stato finale.
+function storiaFor(finale: PRStatus, creata: string): StatusEvent[] {
+  const chain: PRStatus[] = finale === 'Rifiutata'
+    ? ['Bozza', 'Inviata', 'Rifiutata']
+    : STATUS_FLOW.slice(0, STATUS_FLOW.indexOf(finale) + 1);
+  const offsets = [0, 4, 9, 13, 18];
+  return chain.map((stato, i) => ({ stato, data: addDays(creata, offsets[i]) }));
+}
+
+function seedPR(
+  n: number, wbs: WBS, voceCosto: string, fornitore: string, importo: number,
+  stato: PRStatus, dataCreazione: string, note: string,
+): PurchaseRequest {
+  return {
+    id: `pr-${String(n).padStart(3, '0')}`,
+    numero: `PR-2026-${String(n).padStart(4, '0')}`,
+    wbsId: wbs.id, wbsCodice: wbs.codice, wbsNome: wbs.nome,
+    voceCosto, fornitore, importo, stato,
+    creatore: wbs.responsabile, dataCreazione, note,
+    storia: storiaFor(stato, dataCreazione),
+  };
+}
+
+// Seed calibrato: per ogni WBS la somma delle PR confermate (Approvata /
+// Inviata a SAP / PO Creato) riproduce i valori demo storici di impegnato
+// (185k / 320k / 95k / 82k / 198k / 45k). Numerazione in ordine cronologico.
 export const purchaseRequests: PurchaseRequest[] = [
-  {
-    id: 'pr-001', numero: 'PR-2026-0001',
-    wbsId: 'wbs-001', wbsCodice: 'IT-2026-001', wbsNome: 'Infrastruttura Cloud AWS',
-    voceCosto: 'Servizi Cloud', fornitore: 'Amazon Web Services',
-    importo: 85000, stato: 'Approvata',
-    creatore: 'Marco Bianchi', dataCreazione: '2026-02-15', note: 'Rinnovo contratto AWS EC2 - Q1'
-  },
-  {
-    id: 'pr-002', numero: 'PR-2026-0002',
-    wbsId: 'wbs-002', wbsCodice: 'IT-2026-002', wbsNome: 'Progetto SAP S/4HANA Migration',
-    voceCosto: 'Consulenza Esterna', fornitore: 'SAP Italia',
-    importo: 150000, stato: 'Inviata a SAP',
-    creatore: 'Laura Verdi', dataCreazione: '2026-03-01', note: 'Fase 1 implementazione FICO'
-  },
-  {
-    id: 'pr-003', numero: 'PR-2026-0003',
-    wbsId: 'wbs-003', wbsCodice: 'IT-2026-003', wbsNome: 'Sicurezza Informatica & SOC',
-    voceCosto: 'Servizi SOC Gestito', fornitore: 'Leonardo S.p.A.',
-    importo: 45000, stato: 'Approvata',
-    creatore: 'Alessandro Neri', dataCreazione: '2026-01-20', note: 'Servizi SOC H1 2026'
-  },
-  {
-    id: 'pr-004', numero: 'PR-2026-0004',
-    wbsId: 'wbs-005', wbsCodice: 'IT-2026-005', wbsNome: 'Data Platform & Analytics',
-    voceCosto: 'Data Engineering', fornitore: 'Capgemini Italia',
-    importo: 98000, stato: 'Inviata',
-    creatore: 'Stefano Conti', dataCreazione: '2026-04-10', note: 'Sprint 3-4 Data Lake'
-  },
-  {
-    id: 'pr-005', numero: 'PR-2026-0005',
-    wbsId: 'wbs-004', wbsCodice: 'IT-2026-004', wbsNome: 'Digital Workplace & Collaboration',
-    voceCosto: 'Device Management', fornitore: 'TBD',
-    importo: 12000, stato: 'Bozza',
-    creatore: 'Francesca Romano', dataCreazione: '2026-05-05', note: 'Acquisto laptop Q2'
-  },
-  {
-    id: 'pr-006', numero: 'PR-2026-0006',
-    wbsId: 'wbs-002', wbsCodice: 'IT-2026-002', wbsNome: 'Progetto SAP S/4HANA Migration',
-    voceCosto: 'Formazione', fornitore: 'SAP Italia',
-    importo: 25000, stato: 'Rifiutata',
-    creatore: 'Laura Verdi', dataCreazione: '2026-03-20', note: 'Training SAP HANA admin — rifiutata: fuori budget'
-  },
+  seedPR(1, wbsData[2], 'Servizi SOC Gestito', 'Leonardo S.p.A.', 45000, 'Approvata', '2026-01-20', 'Servizi SOC H1 2026'),
+  seedPR(2, wbsData[0], 'Licenze Software', 'Amazon Web Services', 100000, 'PO Creato', '2026-01-28', 'Rinnovo licenze annuali piattaforma'),
+  seedPR(3, wbsData[3], 'Microsoft 365', 'Microsoft Italia', 82000, 'PO Creato', '2026-02-03', 'Rinnovo tenant M365 E3'),
+  seedPR(4, wbsData[0], 'Servizi Cloud', 'Amazon Web Services', 85000, 'Approvata', '2026-02-15', 'Rinnovo contratto AWS EC2 - Q1'),
+  seedPR(5, wbsData[4], 'Data Engineering', 'Capgemini Italia', 110000, 'Approvata', '2026-02-24', 'Sprint 1-2 Data Lake'),
+  seedPR(6, wbsData[1], 'Consulenza Esterna', 'SAP Italia', 150000, 'Inviata a SAP', '2026-03-01', 'Fase 1 implementazione FICO'),
+  seedPR(7, wbsData[5], 'Circuiti WAN', 'TIM Enterprise', 45000, 'PO Creato', '2026-03-09', 'Canoni circuiti WAN H1'),
+  seedPR(8, wbsData[1], 'Licenze SAP', 'SAP Italia', 170000, 'PO Creato', '2026-03-16', 'Licenze S/4HANA — primo lotto'),
+  seedPR(9, wbsData[1], 'Formazione', 'SAP Italia', 25000, 'Rifiutata', '2026-03-20', 'Training SAP HANA admin — rifiutata: fuori budget'),
+  seedPR(10, wbsData[2], 'Tool SIEM', 'Leonardo S.p.A.', 50000, 'Approvata', '2026-03-27', 'Estensione licenza SIEM'),
+  seedPR(11, wbsData[4], 'BI & Reporting', 'Capgemini Italia', 88000, 'PO Creato', '2026-04-02', 'Sviluppo dashboard direzionali'),
+  seedPR(12, wbsData[4], 'Data Engineering', 'Capgemini Italia', 98000, 'Inviata', '2026-04-10', 'Sprint 3-4 Data Lake'),
+  seedPR(13, wbsData[3], 'Device Management', 'TBD', 12000, 'Bozza', '2026-05-05', 'Acquisto laptop Q2'),
 ];
 
 // ---- Persistence (localStorage) ----
 // The prototype has no backend: created WBS, created PRs, and PR status changes
 // are persisted to localStorage and rehydrated into the module arrays on load.
 // Bump the version when the seed data above changes shape.
-const STORAGE_KEY = 'a2a-budget-tool-data-v2'; // v2: seed data moved from 2025 to 2026
+const STORAGE_KEY = 'a2a-budget-tool-data-v3'; // v3: impegnato derivato dalle PR + storia stati PR
 
 interface PersistedData {
   wbs: WBS[];
@@ -290,8 +297,20 @@ export function updatePRStatus(id: string, stato: PRStatus): void {
   const pr = purchaseRequests.find(p => p.id === id);
   if (pr) {
     pr.stato = stato;
+    pr.storia = [...(pr.storia ?? []), { stato, data: new Date().toISOString().split('T')[0] }];
     persist();
   }
+}
+
+const COMMITTED_STATES: PRStatus[] = ['Approvata', 'Inviata a SAP', 'PO Creato'];
+
+// L'impegnato di una WBS deriva dal workflow PR: solo le PR confermate
+// impegnano budget. Il budget check in PurchaseRequests.tsx resta più
+// prudente (esclude solo le Rifiutate) per prevenire l'overcommit.
+export function impegnatoOf(wbsId: string): number {
+  return purchaseRequests
+    .filter(p => p.wbsId === wbsId && COMMITTED_STATES.includes(p.stato))
+    .reduce((s, p) => s + p.importo, 0);
 }
 
 export function resetDemoData(): void {

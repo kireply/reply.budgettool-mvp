@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Filter, Plus, Download, ArrowRight } from 'lucide-react';
-import { wbsData, areas, years, formatCurrency, getWBSStatusColor, purchaseRequests } from '../data/mockData';
+import { wbsData, areas, years, formatCurrency, getWBSStatusColor, purchaseRequests, impegnatoOf } from '../data/mockData';
+import { downloadCsv } from '../utils/csv';
 import { colors, weight } from '../theme';
 import { useI18n } from '../i18n';
 
@@ -25,7 +26,23 @@ export default function WBSList() {
 
   const totBudget = filtered.reduce((s, w) => s + w.budgetTotale, 0);
   const totRolling = filtered.reduce((s, w) => s + w.rollingTotale, 0);
-  const totImpegnato = filtered.reduce((s, w) => s + w.impegnato, 0);
+  const totImpegnato = filtered.reduce((s, w) => s + impegnatoOf(w.id), 0);
+
+  const handleExport = () => {
+    downloadCsv(
+      'a2a-wbs.csv',
+      [t('th.codice'), t('th.nome'), t('th.area'), t('th.responsabile'), t('wd.anno'), t('th.stato'),
+       t('th.budget'), t('th.rolling'), t('th.impegnato'), t('th.disponibile'), t('th.prTot')],
+      filtered.map(w => {
+        const impegnato = impegnatoOf(w.id);
+        return [
+          w.codice, w.nome, w.area, w.responsabile, w.anno, t(`wstatus.${w.stato}`),
+          w.budgetTotale, w.rollingTotale, impegnato, w.rollingTotale - impegnato,
+          purchaseRequests.filter(p => p.wbsId === w.id).length,
+        ];
+      }),
+    );
+  };
 
   return (
     <div className="animate-in">
@@ -35,7 +52,7 @@ export default function WBSList() {
           <p style={{ fontSize: 14, color: colors.grey800 }}>{t('wbs.subtitle')}</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button className="btn-secondary">
+          <button className="btn-secondary" onClick={handleExport}>
             <Download size={15} /> {t('wbs.export')}
           </button>
           {/* Primary CTA: all caps + arrow-in-circle (only CDL all-caps exception) */}
@@ -106,9 +123,10 @@ export default function WBSList() {
           </thead>
           <tbody>
             {filtered.map(w => {
-              const disponibile = w.rollingTotale - w.impegnato;
+              const impegnato = impegnatoOf(w.id);
+              const disponibile = w.rollingTotale - impegnato;
               const prs = purchaseRequests.filter(p => p.wbsId === w.id);
-              const pctUsato = Math.round(w.impegnato / w.rollingTotale * 100);
+              const pctUsato = Math.round(impegnato / w.rollingTotale * 100);
               return (
                 <tr key={w.id} style={{ borderBottom: `1px solid ${colors.grey100}` }}>
                   <td style={{ padding: '10px 12px' }}>
@@ -124,7 +142,7 @@ export default function WBSList() {
                   <td style={{ padding: '10px 12px', color: colors.grey800, fontSize: 12 }}>{w.responsabile}</td>
                   <td style={{ padding: '10px 12px', fontWeight: weight.medium, color: colors.blue800 }}>{formatCurrency(w.budgetTotale)}</td>
                   <td style={{ padding: '10px 12px', fontWeight: weight.semibold, color: colors.azure600 }}>{formatCurrency(w.rollingTotale)}</td>
-                  <td style={{ padding: '10px 12px', fontWeight: weight.semibold, color: colors.green }}>{formatCurrency(w.impegnato)}</td>
+                  <td style={{ padding: '10px 12px', fontWeight: weight.semibold, color: colors.green }}>{formatCurrency(impegnato)}</td>
                   <td style={{ padding: '10px 12px' }}>
                     <span style={{ fontWeight: weight.semibold, color: disponibile < 0 ? colors.red : colors.blue800 }}>
                       {formatCurrency(disponibile)}

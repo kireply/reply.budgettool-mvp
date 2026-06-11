@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Plus, Search, CheckCircle, XCircle, ArrowRight } from 'lucide-react';
+import { Plus, Search, CheckCircle, XCircle, ArrowRight, X } from 'lucide-react';
 import {
-  purchaseRequests, wbsData, vociCosto, fornitori,
+  purchaseRequests, wbsData, vociCosto, fornitori, STATUS_FLOW,
   formatCurrency, getStatusColor, addPurchaseRequest, updatePRStatus,
   type PurchaseRequest, type PRStatus
 } from '../data/mockData';
 import { colors, weight } from '../theme';
 import { useI18n } from '../i18n';
-
-const STATUS_FLOW: PRStatus[] = ['Bozza', 'Inviata', 'Approvata', 'Inviata a SAP', 'PO Creato'];
 
 export default function PurchaseRequests() {
   const { t } = useI18n();
@@ -21,6 +19,7 @@ export default function PurchaseRequests() {
   const [showForm, setShowForm] = useState(!!preselectedWBS);
   const [search, setSearch] = useState('');
   const [filterStato, setFilterStato] = useState('');
+  const [selectedPR, setSelectedPR] = useState<PurchaseRequest | null>(null);
 
   const [form, setForm] = useState({
     wbsId: preselectedWBS || '',
@@ -49,6 +48,7 @@ export default function PurchaseRequests() {
     e.preventDefault();
     if (!budgetCheck?.ok) return;
     const wbs = wbsData.find(w => w.id === form.wbsId)!;
+    const oggi = new Date().toISOString().split('T')[0];
     const newPR: PurchaseRequest = {
       id: `pr-${Date.now()}`,
       numero: `PR-${new Date().getFullYear()}-${String(prs.length + 1).padStart(4, '0')}`,
@@ -60,14 +60,22 @@ export default function PurchaseRequests() {
       importo: parseFloat(form.importo),
       stato: 'Bozza',
       creatore: 'Utente corrente',
-      dataCreazione: new Date().toISOString().split('T')[0],
+      dataCreazione: oggi,
       note: form.note,
+      storia: [{ stato: 'Bozza', data: oggi }],
     };
     addPurchaseRequest(newPR);
     setPrs([...purchaseRequests]);
     setForm({ wbsId: '', voceCosto: '', fornitore: '', importo: '', note: '' });
     setBudgetCheck(null);
     setShowForm(false);
+  };
+
+  // Keep the open detail modal in sync after a mutation
+  const refreshSelected = (prId: string) => {
+    setSelectedPR(prev => (prev && prev.id === prId)
+      ? purchaseRequests.find(p => p.id === prId) ?? null
+      : prev);
   };
 
   const advanceStatus = (prId: string) => {
@@ -77,12 +85,14 @@ export default function PurchaseRequests() {
     if (idx >= 0 && idx < STATUS_FLOW.length - 1) {
       updatePRStatus(prId, STATUS_FLOW[idx + 1]);
       setPrs([...purchaseRequests]);
+      refreshSelected(prId);
     }
   };
 
   const rejectPR = (prId: string) => {
     updatePRStatus(prId, 'Rifiutata');
     setPrs([...purchaseRequests]);
+    refreshSelected(prId);
   };
 
   const filtered = prs.filter(p => {
@@ -250,7 +260,8 @@ export default function PurchaseRequests() {
               const canAdvance = pr.stato !== 'PO Creato' && pr.stato !== 'Rifiutata';
               const canReject = pr.stato === 'Bozza' || pr.stato === 'Inviata';
               return (
-                <tr key={pr.id} style={{ borderBottom: `1px solid ${colors.grey100}` }}>
+                <tr key={pr.id} onClick={() => setSelectedPR(pr)}
+                  style={{ borderBottom: `1px solid ${colors.grey100}`, cursor: 'pointer' }}>
                   <td style={{ padding: '10px 12px', fontWeight: weight.bold, color: colors.azure600 }}>{pr.numero}</td>
                   <td style={{ padding: '10px 12px' }}>
                     <div style={{ fontWeight: weight.medium, color: colors.blue800, fontSize: 12 }}>{pr.wbsCodice}</div>
@@ -267,7 +278,7 @@ export default function PurchaseRequests() {
                     <div style={{ display: 'flex', gap: 4 }}>
                       {/* 32px circular icon buttons (CDL §9 + touch target rule) */}
                       {canAdvance && (
-                        <button onClick={() => advanceStatus(pr.id)}
+                        <button onClick={e => { e.stopPropagation(); advanceStatus(pr.id); }}
                           title={t('pr.advance')}
                           style={{
                             width: 32, height: 32, borderRadius: '50%',
@@ -279,7 +290,7 @@ export default function PurchaseRequests() {
                         </button>
                       )}
                       {canReject && (
-                        <button onClick={() => rejectPR(pr.id)}
+                        <button onClick={e => { e.stopPropagation(); rejectPR(pr.id); }}
                           title={t('pr.reject')}
                           style={{
                             width: 32, height: 32, borderRadius: '50%',
@@ -303,6 +314,96 @@ export default function PurchaseRequests() {
           </div>
         )}
       </div>
+
+      {/* PR detail modal — small modal per CDL: 40% black overlay, 300ms animate-in */}
+      {selectedPR && (
+        <div onClick={() => setSelectedPR(null)} style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 50,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+        }}>
+          <div className="card animate-in" onClick={e => e.stopPropagation()}
+            style={{ width: '100%', maxWidth: 560, maxHeight: 'calc(100vh - 56px)', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+              <div>
+                <div style={{ fontSize: 12, color: colors.grey800, marginBottom: 2 }}>{t('pr.detailTitle')}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <h3 style={{ fontSize: 18, fontWeight: weight.bold, color: colors.blue800 }}>{selectedPR.numero}</h3>
+                  <span className={getStatusColor(selectedPR.stato)}>{t(`status.${selectedPR.stato}`)}</span>
+                </div>
+              </div>
+              {/* 32px circular icon button (CDL touch target rule) */}
+              <button onClick={() => setSelectedPR(null)} title={t('common.close')}
+                style={{
+                  width: 32, height: 32, borderRadius: '50%',
+                  border: `1px solid ${colors.grey300}`, background: 'white', color: colors.grey800,
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'background 300ms cubic-bezier(0.25, 1, 0.5, 1)',
+                }}>
+                <X size={15} />
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+              {[
+                { label: t('th.wbs'), value: `${selectedPR.wbsCodice} — ${selectedPR.wbsNome}` },
+                { label: t('th.voce'), value: selectedPR.voceCosto },
+                { label: t('th.fornitore'), value: selectedPR.fornitore },
+                { label: t('th.importo'), value: formatCurrency(selectedPR.importo) },
+                { label: t('pr.creatore'), value: selectedPR.creatore },
+                { label: t('th.data'), value: selectedPR.dataCreazione },
+              ].map(({ label, value }) => (
+                <div key={label}>
+                  <div style={{ fontSize: 11, color: colors.grey800 }}>{label}</div>
+                  <div style={{ fontSize: 13, fontWeight: weight.medium, color: colors.blue800 }}>{value}</div>
+                </div>
+              ))}
+            </div>
+
+            {selectedPR.note && (
+              <div style={{ marginBottom: 16, padding: '10px 12px', background: colors.grey100, borderRadius: 12 }}>
+                <div style={{ fontSize: 11, color: colors.grey800, marginBottom: 2 }}>{t('th.note')}</div>
+                <div style={{ fontSize: 13, color: colors.blue800 }}>{selectedPR.note}</div>
+              </div>
+            )}
+
+            {/* Status timeline */}
+            <div style={{ borderTop: `1px solid ${colors.grey100}`, paddingTop: 16 }}>
+              <h4 style={{ fontSize: 14, fontWeight: weight.semibold, color: colors.blue800, marginBottom: 12 }}>
+                {t('pr.timeline')}
+              </h4>
+              {(selectedPR.storia ?? []).map((ev, i, arr) => {
+                const isLast = i === arr.length - 1;
+                const dotColor = ev.stato === 'Rifiutata' ? colors.red
+                  : isLast ? colors.azure500
+                  : colors.green;
+                return (
+                  <div key={i} style={{ display: 'flex', gap: 12 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <div style={{
+                        width: 10, height: 10, borderRadius: '50%', marginTop: 4,
+                        background: dotColor, flexShrink: 0,
+                      }} />
+                      {!isLast && <div style={{ width: 2, flex: 1, background: colors.grey300, margin: '2px 0' }} />}
+                    </div>
+                    <div style={{ paddingBottom: isLast ? 0 : 14 }}>
+                      <div style={{ fontSize: 13, fontWeight: isLast ? weight.semibold : weight.medium, color: colors.blue800 }}>
+                        {t(`status.${ev.stato}`)}
+                      </div>
+                      <div style={{ fontSize: 11, color: colors.grey800 }}>{ev.data}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
+              <button className="btn-secondary" onClick={() => setSelectedPR(null)}>
+                {t('common.close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

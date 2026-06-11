@@ -37,6 +37,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     // Common
     'common.reset': 'Reset',
     'common.cancel': 'Annulla',
+    'common.close': 'Chiudi',
 
     // PR statuses (data values stay Italian; these are display labels)
     'status.Bozza': 'Bozza',
@@ -122,7 +123,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     // WBS list
     'wbs.title': 'Gestione WBS',
     'wbs.subtitle': 'Work Breakdown Structure — Inserimento e gestione costi per scenario',
-    'wbs.export': 'Export Excel',
+    'wbs.export': 'Export CSV',
     'wbs.new': 'Nuova WBS',
     'wbs.shown': 'WBS visualizzate',
     'wbs.searchPlaceholder': 'Cerca per codice, nome, responsabile...',
@@ -184,6 +185,9 @@ export const translations: Record<Lang, Record<string, string>> = {
     'pr.advance': 'Avanza stato',
     'pr.reject': 'Rifiuta PR',
     'pr.empty': 'Nessuna Purchase Request trovata.',
+    'pr.detailTitle': 'Dettaglio Purchase Request',
+    'pr.timeline': 'Storico stati',
+    'pr.creatore': 'Creata da',
 
     // New WBS
     'wnew.title': 'Nuova WBS',
@@ -252,6 +256,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     // Common
     'common.reset': 'Reset',
     'common.cancel': 'Cancel',
+    'common.close': 'Close',
 
     // PR statuses
     'status.Bozza': 'Draft',
@@ -337,7 +342,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     // WBS list
     'wbs.title': 'WBS Management',
     'wbs.subtitle': 'Work Breakdown Structure — Cost entry and management by scenario',
-    'wbs.export': 'Export Excel',
+    'wbs.export': 'Export CSV',
     'wbs.new': 'New WBS',
     'wbs.shown': 'WBS displayed',
     'wbs.searchPlaceholder': 'Search by code, name, owner...',
@@ -399,6 +404,9 @@ export const translations: Record<Lang, Record<string, string>> = {
     'pr.advance': 'Advance status',
     'pr.reject': 'Reject PR',
     'pr.empty': 'No Purchase Requests found.',
+    'pr.detailTitle': 'Purchase Request Detail',
+    'pr.timeline': 'Status history',
+    'pr.creatore': 'Created by',
 
     // New WBS
     'wnew.title': 'New WBS',
@@ -467,6 +475,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     // Common
     'common.reset': 'Réinitialiser',
     'common.cancel': 'Annuler',
+    'common.close': 'Fermer',
 
     // PR statuses
     'status.Bozza': 'Brouillon',
@@ -552,7 +561,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     // WBS list
     'wbs.title': 'Gestion WBS',
     'wbs.subtitle': 'Work Breakdown Structure — Saisie et gestion des coûts par scénario',
-    'wbs.export': 'Export Excel',
+    'wbs.export': 'Export CSV',
     'wbs.new': 'Nouvelle WBS',
     'wbs.shown': 'WBS affichées',
     'wbs.searchPlaceholder': 'Rechercher par code, nom, responsable...',
@@ -614,6 +623,9 @@ export const translations: Record<Lang, Record<string, string>> = {
     'pr.advance': 'Avancer le statut',
     'pr.reject': 'Rejeter la PR',
     'pr.empty': 'Aucune Purchase Request trouvée.',
+    'pr.detailTitle': 'Détail de la Purchase Request',
+    'pr.timeline': 'Historique des statuts',
+    'pr.creatore': 'Créée par',
 
     // New WBS
     'wnew.title': 'Nouvelle WBS',
@@ -682,6 +694,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     // Common
     'common.reset': 'Zurücksetzen',
     'common.cancel': 'Abbrechen',
+    'common.close': 'Schließen',
 
     // PR statuses
     'status.Bozza': 'Entwurf',
@@ -767,7 +780,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     // WBS list
     'wbs.title': 'WBS-Verwaltung',
     'wbs.subtitle': 'Work Breakdown Structure — Kostenerfassung und -verwaltung je Szenario',
-    'wbs.export': 'Excel-Export',
+    'wbs.export': 'CSV-Export',
     'wbs.new': 'Neue WBS',
     'wbs.shown': 'Angezeigte WBS',
     'wbs.searchPlaceholder': 'Suche nach Code, Name, Verantwortlichem...',
@@ -829,6 +842,9 @@ export const translations: Record<Lang, Record<string, string>> = {
     'pr.advance': 'Status weiterschalten',
     'pr.reject': 'PR ablehnen',
     'pr.empty': 'Keine Purchase Requests gefunden.',
+    'pr.detailTitle': 'Purchase-Request-Detail',
+    'pr.timeline': 'Statusverlauf',
+    'pr.creatore': 'Erstellt von',
 
     // New WBS
     'wnew.title': 'Neue WBS',

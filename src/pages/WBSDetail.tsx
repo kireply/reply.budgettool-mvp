@@ -4,7 +4,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 import { ArrowLeft, Plus, TrendingUp, Building2, User, Calendar } from 'lucide-react';
-import { wbsData, purchaseRequests, formatCurrency, getStatusColor, getWBSStatusColor } from '../data/mockData';
+import { wbsData, purchaseRequests, formatCurrency, getStatusColor, getWBSStatusColor, impegnatoOf } from '../data/mockData';
 import { colors, weight, chartColors } from '../theme';
 import { useI18n } from '../i18n';
 
@@ -24,8 +24,9 @@ export default function WBSDetail() {
   );
 
   const prs = purchaseRequests.filter(p => p.wbsId === wbs.id);
-  const disponibile = wbs.rollingTotale - wbs.impegnato;
-  const pctUsato = Math.round(wbs.impegnato / wbs.rollingTotale * 100);
+  const impegnato = impegnatoOf(wbs.id);
+  const disponibile = wbs.rollingTotale - impegnato;
+  const pctUsato = Math.round(impegnato / wbs.rollingTotale * 100);
 
   // Monthly distribution data from first cost entry; month labels follow the active language
   const monthlyData = wbs.costi.length > 0
@@ -106,7 +107,7 @@ export default function WBSDetail() {
             {[
               { label: t('kpi.initialBudget'), value: formatCurrency(wbs.budgetTotale), color: chartColors.budget },
               { label: t('wd.activeRolling'), value: formatCurrency(wbs.rollingTotale), color: colors.azure500 },
-              { label: t('wd.committedKpi'), value: formatCurrency(wbs.impegnato), color: colors.orange },
+              { label: t('wd.committedKpi'), value: formatCurrency(impegnato), color: colors.orange },
               { label: t('wd.actualSap'), value: formatCurrency(wbs.actual), color: colors.green },
             ].map(({ label, value, color }) => (
               <div key={label} className="card" style={{ flex: 1, textAlign: 'center' }}>
@@ -124,7 +125,7 @@ export default function WBSDetail() {
               <div style={{ width: `${Math.min(pctUsato, 100)}%`, height: '100%', background: pctUsato > 80 ? colors.red : colors.green, borderRadius: 5, transition: 'width 300ms cubic-bezier(0.25, 1, 0.5, 1)' }} />
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: 12, color: colors.grey800 }}>
-              <span>{t('wd.committedLabel', { value: formatCurrency(wbs.impegnato) })}</span>
+              <span>{t('wd.committedLabel', { value: formatCurrency(impegnato) })}</span>
               <span style={{ color: disponibile < 0 ? colors.red : colors.green, fontWeight: weight.semibold }}>
                 {t('wd.availableLabel', { value: formatCurrency(disponibile) })}
               </span>

@@ -144,7 +144,6 @@ export default function WBSNew() {
       stato: 'Attiva',
       budgetTotale: total,
       rollingTotale: total,
-      impegnato: 0,
       actual: 0,
       costi,
     };

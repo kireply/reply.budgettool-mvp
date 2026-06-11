@@ -5,7 +5,7 @@ import {
   PieChart, Pie, Cell, Legend,
 } from 'recharts';
 import { TrendingUp, TrendingDown, AlertCircle, CheckCircle, Clock, ArrowRight } from 'lucide-react';
-import { wbsData, purchaseRequests, formatCurrency } from '../data/mockData';
+import { wbsData, purchaseRequests, formatCurrency, impegnatoOf } from '../data/mockData';
 import { colors, weight, chartColors } from '../theme';
 import { useI18n } from '../i18n';
 
@@ -15,7 +15,7 @@ export default function Dashboard() {
 
   const totalBudget = wbsData.reduce((s, w) => s + w.budgetTotale, 0);
   const totalRolling = wbsData.reduce((s, w) => s + w.rollingTotale, 0);
-  const totalImpegnato = wbsData.reduce((s, w) => s + w.impegnato, 0);
+  const totalImpegnato = wbsData.reduce((s, w) => s + impegnatoOf(w.id), 0);
   const totalActual = wbsData.reduce((s, w) => s + w.actual, 0);
 
   const prByStatus = purchaseRequests.reduce((acc, pr) => {
@@ -27,7 +27,7 @@ export default function Dashboard() {
     wbsData.reduce((acc, w) => {
       if (!acc[w.area]) acc[w.area] = { area: w.area, pianificato: 0, impegnato: 0, actual: 0 };
       acc[w.area].pianificato += w.rollingTotale;
-      acc[w.area].impegnato += w.impegnato;
+      acc[w.area].impegnato += impegnatoOf(w.id);
       acc[w.area].actual += w.actual;
       return acc;
     }, {} as Record<string, { area: string; pianificato: number; impegnato: number; actual: number }>)
@@ -171,7 +171,8 @@ export default function Dashboard() {
               <tbody>
                 {filteredWBS.map(w => {
                   const prs = purchaseRequests.filter(p => p.wbsId === w.id);
-                  const pct = Math.round(w.impegnato / w.rollingTotale * 100);
+                  const impegnato = impegnatoOf(w.id);
+                  const pct = Math.round(impegnato / w.rollingTotale * 100);
                   return (
                     <tr key={w.id} style={{ borderBottom: `1px solid ${colors.grey100}` }}>
                       <td style={{ padding: '8px 12px' }}>
@@ -182,7 +183,7 @@ export default function Dashboard() {
                       </td>
                       <td style={{ padding: '8px 12px', color: colors.grey800, fontSize: 12 }}>{w.responsabile.split(' ')[0]}</td>
                       <td style={{ padding: '8px 12px', fontWeight: weight.semibold, color: colors.blue800 }}>{formatCurrency(w.rollingTotale)}</td>
-                      <td style={{ padding: '8px 12px', color: colors.green, fontWeight: weight.semibold }}>{formatCurrency(w.impegnato)}</td>
+                      <td style={{ padding: '8px 12px', color: colors.green, fontWeight: weight.semibold }}>{formatCurrency(impegnato)}</td>
                       <td style={{ padding: '8px 12px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <div style={{ width: 48, height: 6, background: colors.grey100, borderRadius: 3 }}>

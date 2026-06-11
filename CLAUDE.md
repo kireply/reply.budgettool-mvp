@@ -56,7 +56,7 @@ Read that file before making any UI/styling changes.
 
 ## Project Overview
 
-**A2A Budget Tool MVP** — a React prototype built for A2A (Italian energy company) by Reply. It manages IT budget lifecycle: WBS creation and cost entry, Purchase Request workflow, and advanced reporting. All data is mocked (no backend, no SAP integration). The PRD is in `prd_structured.txt`.
+**A2A Budget Tool MVP** — a React prototype built for A2A (Italian energy company) by Reply. It manages IT budget lifecycle: WBS creation and cost entry, Purchase Request workflow, and advanced reporting. All data is mocked (no backend, no SAP integration). The original PRD file (`prd_structured.txt`) is no longer in the repo; feature-level PRD/SPEC/PLAN docs live under `docs/prd/`, `docs/design/`, `docs/plans/`.
 
 ## Commands
 
@@ -64,9 +64,10 @@ Read that file before making any UI/styling changes.
 npm run dev       # Start Vite dev server (auto-finds an available port starting at 5173)
 npm run build     # TypeScript check + Vite production build
 npm run preview   # Serve the production build locally
+npm test          # Vitest unit tests (data layer + CSV util; localStorage stubbed in vitest.setup.ts)
 ```
 
-There are no tests or linting configured.
+There is no linting configured.
 
 ## Stack
 
@@ -82,13 +83,14 @@ There are no tests or linting configured.
 
 Single source of truth — all mock data and types live here. Key types:
 
-- `WBS` — a budget unit with `costi: CostEntry[]`, each entry having `monthly: MonthlyData[]` (12-month distribution per scenario)
-- `PurchaseRequest` — references a WBS via `wbsId`; state machine: `Bozza → Inviata → Approvata → Inviata a SAP → PO Creato` (or `Rifiutata`)
+- `WBS` — a budget unit with `costi: CostEntry[]`, each entry having `monthly: MonthlyData[]` (12-month distribution per scenario). There is **no static `impegnato` field**: committed budget is always derived via `impegnatoOf(wbsId)`.
+- `PurchaseRequest` — references a WBS via `wbsId`; state machine (`STATUS_FLOW` exported from here): `Bozza → Inviata → Approvata → Inviata a SAP → PO Creato` (or `Rifiutata`). Each PR carries `storia: StatusEvent[]` (status audit trail): the PR is created with `[{Bozza, today}]` and `updatePRStatus` appends one event per transition.
+- `impegnatoOf(wbsId)` — Σ `importo` of that WBS's PRs in `Approvata`/`Inviata a SAP`/`PO Creato`. The seed PRs are calibrated so the demo totals stay rich (185k/320k/95k/82k/198k/45k); keep that invariant when touching the seed (covered by `mockData.test.ts`).
 - `formatCurrency`, `getStatusColor`, `getWBSStatusColor` — shared formatting helpers exported from here
 
-Pages import directly from `mockData.ts`; there is no state management library.
+Pages import directly from `mockData.ts`; there is no state management library. CSV export goes through `src/utils/csv.ts` (`buildCsv` pure/tested, `downloadCsv` for the browser; `;` separator + UTF-8 BOM for Excel it-IT).
 
-**Persistence:** the module arrays hydrate from localStorage (key `a2a-budget-tool-data-v1`) at module load and persist on every mutation. All mutations MUST go through the exported store functions — `addWBS`, `addPurchaseRequest`, `updatePRStatus` — never mutate the arrays directly. `PurchaseRequests.tsx` keeps a local `useState` mirror refreshed via `setPrs([...purchaseRequests])` after each mutation. Bump the storage key version when the seed data shape changes; `resetDemoData()` (sidebar action) clears storage and reloads.
+**Persistence:** the module arrays hydrate from localStorage (key `a2a-budget-tool-data-v3`) at module load and persist on every mutation. All mutations MUST go through the exported store functions — `addWBS`, `addPurchaseRequest`, `updatePRStatus` — never mutate the arrays directly. `PurchaseRequests.tsx` keeps a local `useState` mirror refreshed via `setPrs([...purchaseRequests])` after each mutation. Bump the storage key version when the seed data shape changes; `resetDemoData()` (sidebar action) clears storage and reloads.
 
 ### Internationalization (`src/i18n.tsx` + `src/translations.ts`)
 
@@ -103,7 +105,7 @@ All routes are wrapped in a single `<Layout>`. Routes:
 
 - `/` → Dashboard
 - `/wbs` → WBSList
-- `/wbs/new` → WBSNew (creation form; new WBS are pushed into the `wbsData` array via `addWBS` — session-only, no persistence)
+- `/wbs/new` → WBSNew (creation form; new WBS are pushed into the `wbsData` array via `addWBS` and persisted to localStorage)
 - `/wbs/:id` → WBSDetail
 - `/purchase-requests` and `/purchase-requests/new` → PurchaseRequests (same component, `useSearchParams` for `?wbs=` pre-selection)
 - `/reportistica` → Reportistica
@@ -136,3 +138,5 @@ disponibile = wbs.rollingTotale − sum(importo of non-Rifiutata PRs on that WBS
 ```
 
 The submit button is disabled if `importo > disponibile`.
+
+Note the intentional asymmetry: the budget *check* is prudent (counts every non-rejected PR, including Bozza/Inviata, to prevent overcommit), while the *displayed* impegnato (`impegnatoOf`) counts only confirmed PRs (`Approvata`/`Inviata a SAP`/`PO Creato`).
