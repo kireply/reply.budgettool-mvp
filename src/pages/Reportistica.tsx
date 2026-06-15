@@ -4,7 +4,7 @@ import {
   Legend, LineChart, Line, CartesianGrid,
 } from 'recharts';
 import { Download, TrendingUp, TrendingDown } from 'lucide-react';
-import { wbsData, purchaseRequests, formatCurrency, impegnatoOf } from '../data/mockData';
+import { wbsData, purchaseRequests, formatCurrency, impegnatoOf, accertatoOf } from '../data/mockData';
 import { downloadCsv } from '../utils/csv';
 import { colors, weight, chartColors } from '../theme';
 import { useI18n } from '../i18n';
@@ -51,6 +51,7 @@ export default function Reportistica() {
   const totalRolling = wbsData.reduce((s, w) => s + w.rollingTotale, 0);
   const totalImpegnato = wbsData.reduce((s, w) => s + impegnatoOf(w.id), 0);
   const totalActual = wbsData.reduce((s, w) => s + w.actual, 0);
+  const totalAccertato = wbsData.reduce((s, w) => s + accertatoOf(w.id), 0);
 
   // Variance analysis
   const varianceData = wbsData.map(w => {
@@ -77,12 +78,12 @@ export default function Reportistica() {
       downloadCsv(
         'report-scostamenti.csv',
         [t('th.codice'), t('th.nomeShort'), t('th.budget'), t('th.rolling'), t('th.scostamento'),
-         t('th.pctScost'), t('th.impegnato'), t('th.disponibile'), t('th.prTot')],
+         t('th.pctScost'), t('th.impegnato'), t('th.disponibile'), t('th.accertato'), t('th.prTot')],
         wbsData.map(w => {
           const v = varianceData.find(x => x.name === w.codice)!;
           return [
             w.codice, w.nome, w.budgetTotale, w.rollingTotale, v.delta, v.pctDelta,
-            v.impegnato, v.disponibile, purchaseRequests.filter(p => p.wbsId === w.id).length,
+            v.impegnato, v.disponibile, accertatoOf(w.id), purchaseRequests.filter(p => p.wbsId === w.id).length,
           ];
         }),
       );
@@ -118,7 +119,7 @@ export default function Reportistica() {
           { label: t('kpi.initialBudget'), value: formatCurrency(totalBudget), sub: t('rep.approvedScenario'), color: chartColors.budget, trend: null },
           { label: t('kpi.activeRolling'), value: formatCurrency(totalRolling), sub: t('kpi.vsBudget', { pct: Math.round((totalRolling/totalBudget-1)*100) }), color: colors.azure500, trend: 'up' },
           { label: t('series.committed'), value: formatCurrency(totalImpegnato), sub: t('kpi.ofRolling', { pct: Math.round(totalImpegnato/totalRolling*100) }), color: colors.orange, trend: null },
-          { label: t('kpi.actualYtd'), value: formatCurrency(totalActual), sub: t('kpi.ofRolling', { pct: Math.round(totalActual/totalRolling*100) }), color: colors.green, trend: 'down' },
+          { label: t('cons.totale'), value: formatCurrency(totalActual + totalAccertato), sub: `${t('cons.sapActual')}: ${formatCurrency(totalActual)} + ${formatCurrency(totalAccertato)} ${t('cons.accertato').toLowerCase()}`, color: colors.blue800, trend: null },
         ].map(({ label, value, sub, color, trend }) => (
           <div key={label} className="card" style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 12, color: colors.grey800, marginBottom: 6 }}>{label}</div>
@@ -225,7 +226,7 @@ export default function Reportistica() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr className="table-head">
-                {[t('th.codice'), t('th.nomeShort'), t('th.budget'), t('th.rolling'), t('th.scostamento'), t('th.pctScost'), t('th.impegnato'), t('th.disponibile'), t('th.prTot')].map(h => (
+                {[t('th.codice'), t('th.nomeShort'), t('th.budget'), t('th.rolling'), t('th.scostamento'), t('th.pctScost'), t('th.impegnato'), t('th.disponibile'), t('th.accertato'), t('th.prTot')].map(h => (
                   <th key={h}>{h}</th>
                 ))}
               </tr>
@@ -251,6 +252,9 @@ export default function Reportistica() {
                     <td style={{ padding: '9px 12px', color: colors.orange }}>{formatCurrency(impegnato)}</td>
                     <td style={{ padding: '9px 12px', fontWeight: weight.semibold, color: w.rollingTotale - impegnato < 0 ? colors.red : colors.blue800 }}>
                       {formatCurrency(w.rollingTotale - impegnato)}
+                    </td>
+                    <td style={{ padding: '9px 12px', color: colors.azure600 }}>
+                      {formatCurrency(accertatoOf(w.id))}
                     </td>
                     <td style={{ padding: '9px 12px' }}>
                       <span style={{ background: colors.azure50, color: colors.blue500, borderRadius: 10, padding: '2px 8px', fontSize: 11, fontWeight: weight.semibold }}>

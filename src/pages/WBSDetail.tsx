@@ -4,17 +4,35 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 import { ArrowLeft, Plus, TrendingUp, Building2, User, Calendar } from 'lucide-react';
-import { wbsData, purchaseRequests, formatCurrency, getStatusColor, getWBSStatusColor, impegnatoOf } from '../data/mockData';
+import {
+  wbsData, purchaseRequests, accertamenti, entrateMerciPianificate,
+  formatCurrency, getStatusColor, getWBSStatusColor, impegnatoOf,
+  accertatoOf, addAccertamento, addEMP, updateEMPStato,
+  type Accertamento, type EntrataMerciPianificata, type EMStato,
+  MONTHS, getEMPStatusColor,
+} from '../data/mockData';
 import { colors, weight, chartColors } from '../theme';
 import { useI18n } from '../i18n';
 
 type ScenarioKey = 'budget' | 'rolling' | 'actual';
+type TabKey = 'costi' | 'distribuzione' | 'pr' | 'consuntivo';
+
+const EMP_FLOW: EMStato[] = ['Pianificata', 'Confermata', 'Ricevuta SAP'];
 
 export default function WBSDetail() {
   const { t, months } = useI18n();
   const { id } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = useState<'costi' | 'distribuzione' | 'pr'>('costi');
+
+  const [activeTab, setActiveTab] = useState<TabKey>('costi');
   const [selectedScenarios, setSelectedScenarios] = useState<ScenarioKey[]>(['budget', 'rolling']);
+
+  // Consuntivo tab state — must be declared before the early return (hook rules)
+  const [localAcc, setLocalAcc] = useState<Accertamento[]>(() => accertamenti.filter(a => a.wbsId === (id ?? '')));
+  const [localEMP, setLocalEMP] = useState<EntrataMerciPianificata[]>(() => entrateMerciPianificate.filter(e => e.wbsId === (id ?? '')));
+  const [showAccForm, setShowAccForm] = useState(false);
+  const [showEmpForm, setShowEmpForm] = useState(false);
+  const [accForm, setAccForm] = useState({ voceCosto: '', mese: 'Gen', importo: '', note: '' });
+  const [empForm, setEmpForm] = useState({ voceCosto: '', fornitore: '', dataPrevista: '', importo: '', note: '' });
 
   const wbs = wbsData.find(w => w.id === id);
   if (!wbs) return (
@@ -28,7 +46,6 @@ export default function WBSDetail() {
   const disponibile = wbs.rollingTotale - impegnato;
   const pctUsato = Math.round(impegnato / wbs.rollingTotale * 100);
 
-  // Monthly distribution data from first cost entry; month labels follow the active language
   const monthlyData = wbs.costi.length > 0
     ? wbs.costi[0].monthly.map((_, i) => ({
         month: months[i],
@@ -50,9 +67,61 @@ export default function WBSDetail() {
     actual: chartColors.impegnato,
   };
 
+  // Consuntivo tab handlers
+  const handleSaveAcc = () => {
+    if (!accForm.voceCosto || !accForm.importo) return;
+    const importoNum = parseFloat(accForm.importo);
+    if (isNaN(importoNum) || importoNum <= 0) return;
+    const a: Accertamento = {
+      id: `acc-${Date.now()}`,
+      wbsId: wbs.id,
+      voceCosto: accForm.voceCosto,
+      mese: accForm.mese,
+      anno: wbs.anno,
+      importo: importoNum,
+      note: accForm.note,
+      creatore: wbs.responsabile,
+      dataCreazione: new Date().toISOString().split('T')[0],
+    };
+    addAccertamento(a);
+    setLocalAcc([...accertamenti.filter(x => x.wbsId === wbs.id)]);
+    setAccForm({ voceCosto: '', mese: 'Gen', importo: '', note: '' });
+    setShowAccForm(false);
+  };
+
+  const handleSaveEmp = () => {
+    if (!empForm.voceCosto || !empForm.dataPrevista || !empForm.importo) return;
+    const importoNum = parseFloat(empForm.importo);
+    if (isNaN(importoNum) || importoNum <= 0) return;
+    const e: EntrataMerciPianificata = {
+      id: `emp-${Date.now()}`,
+      wbsId: wbs.id,
+      voceCosto: empForm.voceCosto,
+      fornitore: empForm.fornitore || wbs.fornitore,
+      dataPrevista: empForm.dataPrevista,
+      importo: importoNum,
+      stato: 'Pianificata',
+      note: empForm.note,
+      creatore: wbs.responsabile,
+      dataCreazione: new Date().toISOString().split('T')[0],
+    };
+    addEMP(e);
+    setLocalEMP([...entrateMerciPianificate.filter(x => x.wbsId === wbs.id)]);
+    setEmpForm({ voceCosto: '', fornitore: '', dataPrevista: '', importo: '', note: '' });
+    setShowEmpForm(false);
+  };
+
+  const handleAdvanceEMP = (empId: string, currentStato: EMStato) => {
+    const idx = EMP_FLOW.indexOf(currentStato);
+    if (idx < EMP_FLOW.length - 1) {
+      updateEMPStato(empId, EMP_FLOW[idx + 1]);
+      setLocalEMP([...entrateMerciPianificate.filter(x => x.wbsId === wbs.id)]);
+    }
+  };
+
   return (
     <div className="animate-in">
-      {/* Breadcrumb — every level clickable except current (CDL §17) */}
+      {/* Breadcrumb */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontSize: 13, color: colors.grey800 }}>
         <Link to="/wbs" className="ghost-link" style={{ fontWeight: weight.medium }}>
           <ArrowLeft size={15} /> {t('wbs.title')}
@@ -75,7 +144,6 @@ export default function WBSDetail() {
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Calendar size={13} />{wbs.anno}</span>
           </div>
         </div>
-        {/* Primary CTA: all caps + arrow-in-circle */}
         <Link to={`/purchase-requests/new?wbs=${wbs.id}`} className="cta-primary">
           {t('wd.createPR')}
           <span className="cta-circle"><Plus size={15} /></span>
@@ -84,7 +152,6 @@ export default function WBSDetail() {
 
       {/* Info + KPI */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', gap: 16, marginBottom: 24 }}>
-        {/* Anagrafica */}
         <div className="card">
           <h3 style={{ fontSize: 14, fontWeight: weight.semibold, color: colors.blue800, marginBottom: 12 }}>{t('wd.registry')}</h3>
           {[
@@ -101,7 +168,6 @@ export default function WBSDetail() {
           ))}
         </div>
 
-        {/* Budget KPI — Big Data Items: value in azure (CDL §34) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', gap: 12 }}>
             {[
@@ -138,16 +204,17 @@ export default function WBSDetail() {
         </div>
       </div>
 
-      {/* Tabs — anchor-link style (CDL §16) */}
+      {/* Tabs */}
       <div style={{ display: 'flex', gap: 0, borderBottom: `2px solid ${colors.grey300}`, marginBottom: 20 }}>
         {[
           { key: 'costi', label: t('tab.costs') },
           { key: 'distribuzione', label: t('tab.distribution') },
           { key: 'pr', label: t('tab.pr', { n: prs.length }) },
+          { key: 'consuntivo', label: t('tab.consuntivo') },
         ].map(({ key, label }) => (
           <button
             key={key}
-            onClick={() => setActiveTab(key as typeof activeTab)}
+            onClick={() => setActiveTab(key as TabKey)}
             className={`tab ${activeTab === key ? 'active' : ''}`}
           >
             {label}
@@ -155,7 +222,7 @@ export default function WBSDetail() {
         ))}
       </div>
 
-      {/* Tab Content */}
+      {/* Tab: Voci di Costo */}
       {activeTab === 'costi' && (
         <div className="card animate-in" style={{ padding: 0, overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
@@ -208,6 +275,7 @@ export default function WBSDetail() {
         </div>
       )}
 
+      {/* Tab: Distribuzione Mensile */}
       {activeTab === 'distribuzione' && (
         <div className="card animate-in">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
@@ -275,6 +343,7 @@ export default function WBSDetail() {
         </div>
       )}
 
+      {/* Tab: Purchase Request */}
       {activeTab === 'pr' && (
         <div className="card animate-in" style={{ padding: prs.length === 0 ? 24 : 0, overflow: 'hidden' }}>
           {prs.length === 0 ? (
@@ -309,6 +378,184 @@ export default function WBSDetail() {
               </tbody>
             </table>
           )}
+        </div>
+      )}
+
+      {/* Tab: Consuntivo */}
+      {activeTab === 'consuntivo' && (
+        <div className="animate-in">
+          {/* KPI Summary */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 20 }}>
+            {[
+              { label: t('cons.sapActual'), value: formatCurrency(wbs.actual), color: colors.green },
+              { label: t('cons.accertato'), value: formatCurrency(accertatoOf(wbs.id)), color: colors.azure600 },
+              { label: t('cons.totale'), value: formatCurrency(wbs.actual + accertatoOf(wbs.id)), color: colors.blue800 },
+            ].map(({ label, value, color }) => (
+              <div key={label} className="card" style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 12, color: colors.grey800, marginBottom: 6 }}>{label}</div>
+                <div style={{ fontSize: 20, fontWeight: weight.bold, color }}>{value}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Sezione Accertamenti */}
+          <div className="card" style={{ marginBottom: 16, padding: 0, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderBottom: `1px solid ${colors.grey100}` }}>
+              <h3 style={{ fontSize: 15, fontWeight: weight.semibold, color: colors.blue800 }}>{t('cons.accTitle')}</h3>
+              <button
+                className="btn-secondary"
+                onClick={() => { setShowAccForm(p => !p); setShowEmpForm(false); }}
+                style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}
+              >
+                <Plus size={13} /> {t('cons.addAcc')}
+              </button>
+            </div>
+
+            {showAccForm && (
+              <div style={{ padding: 16, background: colors.grey100, borderBottom: `1px solid ${colors.grey300}` }}>
+                <p style={{ fontSize: 13, fontWeight: weight.semibold, color: colors.blue800, marginBottom: 12 }}>{t('cons.accFormTitle')}</p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 2fr', gap: 12, marginBottom: 12 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, color: colors.grey800, marginBottom: 4 }}>{t('cons.mese')}</label>
+                    <select className="select" value={accForm.mese} onChange={e => setAccForm(p => ({ ...p, mese: e.target.value }))}>
+                      {MONTHS.map((m, i) => <option key={m} value={m}>{months[i]}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, color: colors.grey800, marginBottom: 4 }}>{t('th.voce')}</label>
+                    <select className="select" value={accForm.voceCosto} onChange={e => setAccForm(p => ({ ...p, voceCosto: e.target.value }))}>
+                      <option value="">—</option>
+                      {wbs.costi.map(c => <option key={c.voce} value={c.voce}>{c.voce}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, color: colors.grey800, marginBottom: 4 }}>{t('th.importo')}</label>
+                    <input type="number" className="input" value={accForm.importo} onChange={e => setAccForm(p => ({ ...p, importo: e.target.value }))} placeholder="Es: 15000" min="1" />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, color: colors.grey800, marginBottom: 4 }}>{t('th.note')}</label>
+                    <input type="text" className="input" value={accForm.note} onChange={e => setAccForm(p => ({ ...p, note: e.target.value }))} placeholder={t('pr.notePh')} />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button className="btn-secondary" onClick={handleSaveAcc} style={{ fontSize: 12 }}>{t('cons.save')}</button>
+                  <button onClick={() => setShowAccForm(false)} style={{ fontSize: 12, background: 'none', border: 'none', color: colors.grey800, cursor: 'pointer' }}>{t('common.cancel')}</button>
+                </div>
+              </div>
+            )}
+
+            {localAcc.length === 0 ? (
+              <div style={{ padding: '24px 16px', textAlign: 'center', color: colors.grey800, fontSize: 13 }}>{t('cons.noAcc')}</div>
+            ) : (
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                <thead>
+                  <tr className="table-head">
+                    {[t('th.mese'), t('th.voce'), t('th.importo'), t('th.note'), t('th.responsabile'), t('th.data')].map(h => <th key={h}>{h}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {localAcc.map(a => (
+                    <tr key={a.id} style={{ borderBottom: `1px solid ${colors.grey100}` }}>
+                      <td style={{ padding: '9px 12px', fontWeight: weight.semibold, color: colors.azure600 }}>{a.mese} {a.anno}</td>
+                      <td style={{ padding: '9px 12px', color: colors.blue800 }}>{a.voceCosto}</td>
+                      <td style={{ padding: '9px 12px', fontWeight: weight.semibold, color: colors.azure600 }}>{formatCurrency(a.importo)}</td>
+                      <td style={{ padding: '9px 12px', color: colors.grey800, fontSize: 12, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.note || '—'}</td>
+                      <td style={{ padding: '9px 12px', color: colors.grey800, fontSize: 12 }}>{a.creatore}</td>
+                      <td style={{ padding: '9px 12px', color: colors.grey800, fontSize: 12 }}>{a.dataCreazione}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          {/* Sezione Entrate Merci Pianificate */}
+          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderBottom: `1px solid ${colors.grey100}` }}>
+              <h3 style={{ fontSize: 15, fontWeight: weight.semibold, color: colors.blue800 }}>{t('cons.empTitle')}</h3>
+              <button
+                className="btn-secondary"
+                onClick={() => { setShowEmpForm(p => !p); setShowAccForm(false); }}
+                style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}
+              >
+                <Plus size={13} /> {t('cons.addEmp')}
+              </button>
+            </div>
+
+            {showEmpForm && (
+              <div style={{ padding: 16, background: colors.grey100, borderBottom: `1px solid ${colors.grey300}` }}>
+                <p style={{ fontSize: 13, fontWeight: weight.semibold, color: colors.blue800, marginBottom: 12 }}>{t('cons.empFormTitle')}</p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 2fr', gap: 12, marginBottom: 12 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, color: colors.grey800, marginBottom: 4 }}>{t('th.voce')}</label>
+                    <select className="select" value={empForm.voceCosto} onChange={e => setEmpForm(p => ({ ...p, voceCosto: e.target.value }))}>
+                      <option value="">—</option>
+                      {wbs.costi.map(c => <option key={c.voce} value={c.voce}>{c.voce}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, color: colors.grey800, marginBottom: 4 }}>{t('th.fornitore')}</label>
+                    <input type="text" className="input" value={empForm.fornitore} onChange={e => setEmpForm(p => ({ ...p, fornitore: e.target.value }))} placeholder={wbs.fornitore} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, color: colors.grey800, marginBottom: 4 }}>{t('cons.dataPrevista')}</label>
+                    <input type="date" className="input" value={empForm.dataPrevista} onChange={e => setEmpForm(p => ({ ...p, dataPrevista: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, color: colors.grey800, marginBottom: 4 }}>{t('th.importo')}</label>
+                    <input type="number" className="input" value={empForm.importo} onChange={e => setEmpForm(p => ({ ...p, importo: e.target.value }))} placeholder="Es: 50000" min="1" />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, color: colors.grey800, marginBottom: 4 }}>{t('th.note')}</label>
+                    <input type="text" className="input" value={empForm.note} onChange={e => setEmpForm(p => ({ ...p, note: e.target.value }))} placeholder={t('pr.notePh')} />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button className="btn-secondary" onClick={handleSaveEmp} style={{ fontSize: 12 }}>{t('cons.save')}</button>
+                  <button onClick={() => setShowEmpForm(false)} style={{ fontSize: 12, background: 'none', border: 'none', color: colors.grey800, cursor: 'pointer' }}>{t('common.cancel')}</button>
+                </div>
+              </div>
+            )}
+
+            {localEMP.length === 0 ? (
+              <div style={{ padding: '24px 16px', textAlign: 'center', color: colors.grey800, fontSize: 13 }}>{t('cons.noEmp')}</div>
+            ) : (
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                <thead>
+                  <tr className="table-head">
+                    {[t('th.dataPrevista'), t('th.voce'), t('th.fornitore'), t('th.importo'), t('th.stato'), ''].map((h, i) => <th key={i}>{h}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {localEMP.map(e => {
+                    const canAdvance = EMP_FLOW.indexOf(e.stato) < EMP_FLOW.length - 1;
+                    return (
+                      <tr key={e.id} style={{ borderBottom: `1px solid ${colors.grey100}` }}>
+                        <td style={{ padding: '9px 12px', fontWeight: weight.semibold, color: colors.blue800 }}>{e.dataPrevista}</td>
+                        <td style={{ padding: '9px 12px', color: colors.blue800 }}>{e.voceCosto}</td>
+                        <td style={{ padding: '9px 12px', color: colors.grey800 }}>{e.fornitore}</td>
+                        <td style={{ padding: '9px 12px', fontWeight: weight.semibold, color: colors.azure600 }}>{formatCurrency(e.importo)}</td>
+                        <td style={{ padding: '9px 12px' }}>
+                          <span className={getEMPStatusColor(e.stato)}>{t(`emstatus.${e.stato}`)}</span>
+                        </td>
+                        <td style={{ padding: '9px 12px' }}>
+                          {canAdvance && (
+                            <button
+                              className="ghost-link"
+                              onClick={() => handleAdvanceEMP(e.id, e.stato)}
+                              style={{ fontSize: 12 }}
+                            >
+                              {t('cons.avanza')}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
       )}
     </div>
