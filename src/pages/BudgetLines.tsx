@@ -43,8 +43,8 @@ export default function BudgetLines() {
       </div>
 
       {/* Table */}
-      <div className="card" style={{ overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <div className="card" style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', minWidth: 900, borderCollapse: 'collapse' }}>
           <thead>
             <tr className="table-head">
               <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: 12 }}>{t('bl.codice')}</th>
