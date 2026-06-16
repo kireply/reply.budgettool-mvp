@@ -4,6 +4,7 @@ import { Plus, Search, CheckCircle, XCircle, ArrowRight, X } from 'lucide-react'
 import {
   purchaseRequests, wbsData, vociCosto, fornitori, STATUS_FLOW,
   formatCurrency, getStatusColor, addPurchaseRequest, updatePRStatus,
+  accertatoByVoce,
   type PurchaseRequest, type PRStatus
 } from '../data/mockData';
 import { colors, weight } from '../theme';
@@ -338,14 +339,14 @@ export default function PurchaseRequests() {
         )}
       </div>
 
-      {/* PR detail modal — small modal per CDL: 40% black overlay, 300ms animate-in */}
+      {/* PR detail modal — small modal (560px) normally; wider (800px) for PO Creato with cost breakdown */}
       {selectedPR && (
         <div onClick={() => setSelectedPR(null)} style={{
           position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 50,
           display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
         }}>
           <div className="card animate-in" onClick={e => e.stopPropagation()}
-            style={{ width: '100%', maxWidth: 560, maxHeight: 'calc(100vh - 56px)', overflowY: 'auto' }}>
+            style={{ width: '100%', maxWidth: selectedPR.stato === 'PO Creato' ? 800 : 560, maxHeight: 'calc(100vh - 56px)', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
               <div>
                 <div style={{ fontSize: 12, color: colors.grey800, marginBottom: 2 }}>{t('pr.detailTitle')}</div>
@@ -388,6 +389,57 @@ export default function PurchaseRequests() {
                 <div style={{ fontSize: 13, color: colors.blue800 }}>{selectedPR.note}</div>
               </div>
             )}
+
+            {/* PO cost breakdown — shown only when PO Creato */}
+            {selectedPR.stato === 'PO Creato' && (() => {
+              const wbs = wbsData.find(w => w.id === selectedPR.wbsId);
+              if (!wbs) return null;
+              return (
+                <div style={{ borderTop: `1px solid ${colors.grey100}`, paddingTop: 16, marginBottom: 16 }}>
+                  <h4 style={{ fontSize: 14, fontWeight: weight.semibold, color: colors.blue800, marginBottom: 12 }}>
+                    {t('po.costBreakdown')} — {wbs.codice}
+                  </h4>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                      <thead>
+                        <tr className="table-head">
+                          <th style={{ padding: '8px 12px', textAlign: 'left' }}>{t('th.voce')}</th>
+                          <th style={{ padding: '8px 12px', textAlign: 'right' }}>{t('po.budget')}</th>
+                          <th style={{ padding: '8px 12px', textAlign: 'right' }}>{t('po.rolling')}</th>
+                          <th style={{ padding: '8px 12px', textAlign: 'right' }}>{t('po.actualSAP')}</th>
+                          <th style={{ padding: '8px 12px', textAlign: 'right' }}>{t('po.accertato')}</th>
+                          <th style={{ padding: '8px 12px', textAlign: 'right' }}>{t('po.consuntivo')}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {wbs.costi.map((c, i) => {
+                          const acc = accertatoByVoce(wbs.id, c.voce);
+                          const consuntivo = c.actual + acc;
+                          return (
+                            <tr key={c.voce} style={{ borderBottom: `1px solid ${colors.grey300}`, background: i % 2 === 0 ? 'white' : colors.grey100 }}>
+                              <td style={{ padding: '8px 12px', fontWeight: weight.medium, color: colors.blue800 }}>{c.voce}</td>
+                              <td style={{ padding: '8px 12px', textAlign: 'right' }}>{formatCurrency(c.budget)}</td>
+                              <td style={{ padding: '8px 12px', textAlign: 'right', color: colors.azure500 }}>{formatCurrency(c.rolling)}</td>
+                              <td style={{ padding: '8px 12px', textAlign: 'right', color: colors.green }}>{formatCurrency(c.actual)}</td>
+                              <td style={{ padding: '8px 12px', textAlign: 'right', color: colors.orange }}>{formatCurrency(acc)}</td>
+                              <td style={{ padding: '8px 12px', textAlign: 'right', fontWeight: weight.semibold, color: colors.blue800 }}>{formatCurrency(consuntivo)}</td>
+                            </tr>
+                          );
+                        })}
+                        <tr style={{ background: colors.grey100, fontWeight: weight.semibold }}>
+                          <td style={{ padding: '8px 12px', color: colors.blue800 }}>Totale</td>
+                          <td style={{ padding: '8px 12px', textAlign: 'right' }}>{formatCurrency(wbs.costi.reduce((s, c) => s + c.budget, 0))}</td>
+                          <td style={{ padding: '8px 12px', textAlign: 'right', color: colors.azure500 }}>{formatCurrency(wbs.costi.reduce((s, c) => s + c.rolling, 0))}</td>
+                          <td style={{ padding: '8px 12px', textAlign: 'right', color: colors.green }}>{formatCurrency(wbs.costi.reduce((s, c) => s + c.actual, 0))}</td>
+                          <td style={{ padding: '8px 12px', textAlign: 'right', color: colors.orange }}>{formatCurrency(wbs.costi.reduce((s, c) => s + accertatoByVoce(wbs.id, c.voce), 0))}</td>
+                          <td style={{ padding: '8px 12px', textAlign: 'right', color: colors.blue800 }}>{formatCurrency(wbs.costi.reduce((s, c) => s + c.actual + accertatoByVoce(wbs.id, c.voce), 0))}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Status timeline */}
             <div style={{ borderTop: `1px solid ${colors.grey100}`, paddingTop: 16 }}>

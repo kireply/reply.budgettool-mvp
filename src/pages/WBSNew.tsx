@@ -145,6 +145,7 @@ export default function WBSNew() {
       budgetTotale: total,
       rollingTotale: total,
       actual: 0,
+      budgetLineId: '',
       costi,
     };
     addWBS(newWBS);

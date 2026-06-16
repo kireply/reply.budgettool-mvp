@@ -9,6 +9,7 @@ import WBSNew from './pages/WBSNew';
 import WBSDetail from './pages/WBSDetail';
 import PurchaseRequests from './pages/PurchaseRequests';
 import Reportistica from './pages/Reportistica';
+import BudgetLines from './pages/BudgetLines';
 
 export default function App() {
   const [authed, setAuthed] = useState(() => localStorage.getItem('a2a-auth') === '1');
@@ -22,6 +23,7 @@ export default function App() {
           <Layout>
             <Routes>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/budget-lines" element={<BudgetLines />} />
               <Route path="/wbs" element={<WBSList />} />
               <Route path="/wbs/new" element={<WBSNew />} />
               <Route path="/wbs/:id" element={<WBSDetail />} />

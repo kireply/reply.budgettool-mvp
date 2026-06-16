@@ -267,6 +267,27 @@ export const translations: Record<Lang, Record<string, string>> = {
     'th.dataPrevista': 'Data Prevista',
     'th.accertato': 'Accertato',
     'th.consuntivo': 'Consuntivo',
+
+    // Budget Lines
+    'nav.budgetLines': 'Righe di Budget',
+    'bl.title': 'Righe di Budget',
+    'bl.subtitle': 'Anagrafica righe di budget — struttura di controllo sopra le WBS',
+    'bl.codice': 'Codice',
+    'bl.linkedWBS': 'WBS Collegate',
+    'bl.wbsCount': '{n} WBS',
+    'bl.totalBudget': 'Budget Riga',
+    'bl.area': 'Area',
+    'bl.responsabile': 'Responsabile',
+
+    // PO detail
+    'po.title': 'Dettaglio PO',
+    'po.costBreakdown': 'Ripartizione costi per voce',
+    'po.budget': 'Budget',
+    'po.rolling': 'Rolling',
+    'po.actualSAP': 'Actual SAP',
+    'po.accertato': 'Accertato',
+    'po.consuntivo': 'Consuntivo',
+    'po.pr': 'PR',
   },
 
   en: {
@@ -518,6 +539,27 @@ export const translations: Record<Lang, Record<string, string>> = {
     'th.dataPrevista': 'Expected Date',
     'th.accertato': 'Accrued',
     'th.consuntivo': 'Total Actual',
+
+    // Budget Lines
+    'nav.budgetLines': 'Budget Lines',
+    'bl.title': 'Budget Lines',
+    'bl.subtitle': 'Budget line master data — control layer above WBS',
+    'bl.codice': 'Code',
+    'bl.linkedWBS': 'Linked WBS',
+    'bl.wbsCount': '{n} WBS',
+    'bl.totalBudget': 'Line Budget',
+    'bl.area': 'Area',
+    'bl.responsabile': 'Owner',
+
+    // PO detail
+    'po.title': 'PO Detail',
+    'po.costBreakdown': 'Cost breakdown by item',
+    'po.budget': 'Budget',
+    'po.rolling': 'Rolling',
+    'po.actualSAP': 'Actual SAP',
+    'po.accertato': 'Accrued',
+    'po.consuntivo': 'Total Actual',
+    'po.pr': 'PR',
   },
 
   fr: {
@@ -769,6 +811,27 @@ export const translations: Record<Lang, Record<string, string>> = {
     'th.dataPrevista': 'Date prévue',
     'th.accertato': 'Constaté',
     'th.consuntivo': 'Total réel',
+
+    // Budget Lines
+    'nav.budgetLines': 'Lignes budgétaires',
+    'bl.title': 'Lignes budgétaires',
+    'bl.subtitle': 'Référentiel des lignes budgétaires — couche de contrôle au-dessus des WBS',
+    'bl.codice': 'Code',
+    'bl.linkedWBS': 'WBS liées',
+    'bl.wbsCount': '{n} WBS',
+    'bl.totalBudget': 'Budget ligne',
+    'bl.area': 'Domaine',
+    'bl.responsabile': 'Responsable',
+
+    // PO detail
+    'po.title': 'Détail PO',
+    'po.costBreakdown': 'Répartition des coûts par poste',
+    'po.budget': 'Budget',
+    'po.rolling': 'Rolling',
+    'po.actualSAP': 'Réel SAP',
+    'po.accertato': 'Constaté',
+    'po.consuntivo': 'Total réel',
+    'po.pr': 'DA',
   },
 
   de: {
@@ -1020,5 +1083,26 @@ export const translations: Record<Lang, Record<string, string>> = {
     'th.dataPrevista': 'Geplantes Datum',
     'th.accertato': 'Abgegrenzt',
     'th.consuntivo': 'Gesamt-Ist',
+
+    // Budget Lines
+    'nav.budgetLines': 'Budgetpositionen',
+    'bl.title': 'Budgetpositionen',
+    'bl.subtitle': 'Budgetpositions-Stammdaten — Kontrollschicht über den WBS',
+    'bl.codice': 'Code',
+    'bl.linkedWBS': 'Verknüpfte WBS',
+    'bl.wbsCount': '{n} WBS',
+    'bl.totalBudget': 'Positionsbudget',
+    'bl.area': 'Bereich',
+    'bl.responsabile': 'Verantwortlicher',
+
+    // PO detail
+    'po.title': 'Bestelldetail',
+    'po.costBreakdown': 'Kostenaufschlüsselung nach Position',
+    'po.budget': 'Budget',
+    'po.rolling': 'Rolling',
+    'po.actualSAP': 'Ist SAP',
+    'po.accertato': 'Abgegrenzt',
+    'po.consuntivo': 'Gesamt-Ist',
+    'po.pr': 'Bestellanforderung',
   },
 };

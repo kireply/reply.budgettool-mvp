@@ -33,6 +33,7 @@ export interface WBS {
   rollingTotale: number;
   actual: number;
   costi: CostEntry[];
+  budgetLineId: string;
 }
 
 export const STATUS_FLOW: PRStatus[] = ['Bozza', 'Inviata', 'Approvata', 'Inviata a SAP', 'PO Creato'];
@@ -85,6 +86,16 @@ export interface EntrataMerciPianificata {
   dataCreazione: string;
 }
 
+export interface BudgetLine {
+  id: string;
+  codice: string;
+  nome: string;
+  area: string;
+  responsabile: string;
+  anno: number;
+  budgetTotale: number;
+}
+
 export const MONTHS = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
 
 function monthlySpread(total: number, variance = 0.2): MonthlyData[] {
@@ -115,6 +126,7 @@ export const wbsData: WBS[] = [
     budgetTotale: 480000,
     rollingTotale: 504000,
     actual: 142000,
+    budgetLineId: 'bl-001',
     costi: [
       { voce: 'Licenze Software', tipo: 'Opex', budget: 120000, rolling: 126000, actual: 48000, monthly: monthlySpread(120000) },
       { voce: 'Servizi Cloud', tipo: 'Opex', budget: 240000, rolling: 252000, actual: 78000, monthly: monthlySpread(240000, 0.3) },
@@ -135,6 +147,7 @@ export const wbsData: WBS[] = [
     budgetTotale: 750000,
     rollingTotale: 787500,
     actual: 265000,
+    budgetLineId: 'bl-002',
     costi: [
       { voce: 'Consulenza Esterna', tipo: 'Capex', budget: 450000, rolling: 472500, actual: 187000, monthly: monthlySpread(450000, 0.1) },
       { voce: 'Licenze SAP', tipo: 'Opex', budget: 200000, rolling: 210000, actual: 68000, monthly: monthlySpread(200000, 0.05) },
@@ -155,6 +168,7 @@ export const wbsData: WBS[] = [
     budgetTotale: 320000,
     rollingTotale: 336000,
     actual: 78000,
+    budgetLineId: 'bl-003',
     costi: [
       { voce: 'Servizi SOC Gestito', tipo: 'Opex', budget: 180000, rolling: 189000, actual: 58000, monthly: monthlySpread(180000) },
       { voce: 'Tool SIEM', tipo: 'Opex', budget: 90000, rolling: 94500, actual: 15000, monthly: monthlySpread(90000, 0.1) },
@@ -175,6 +189,7 @@ export const wbsData: WBS[] = [
     budgetTotale: 210000,
     rollingTotale: 220500,
     actual: 67500,
+    budgetLineId: 'bl-004',
     costi: [
       { voce: 'Microsoft 365', tipo: 'Opex', budget: 120000, rolling: 126000, actual: 50000, monthly: monthlySpread(120000, 0.05) },
       { voce: 'Device Management', tipo: 'Capex', budget: 60000, rolling: 63000, actual: 12000, monthly: monthlySpread(60000, 0.3) },
@@ -195,6 +210,7 @@ export const wbsData: WBS[] = [
     budgetTotale: 560000,
     rollingTotale: 588000,
     actual: 154000,
+    budgetLineId: 'bl-005',
     costi: [
       { voce: 'Data Engineering', tipo: 'Capex', budget: 280000, rolling: 294000, actual: 98000, monthly: monthlySpread(280000, 0.15) },
       { voce: 'BI & Reporting', tipo: 'Opex', budget: 160000, rolling: 168000, actual: 42000, monthly: monthlySpread(160000, 0.2) },
@@ -215,11 +231,20 @@ export const wbsData: WBS[] = [
     budgetTotale: 180000,
     rollingTotale: 189000,
     actual: 38000,
+    budgetLineId: 'bl-001',
     costi: [
       { voce: 'Circuiti WAN', tipo: 'Opex', budget: 120000, rolling: 126000, actual: 30000, monthly: monthlySpread(120000, 0.05) },
       { voce: 'SD-WAN Upgrade', tipo: 'Capex', budget: 60000, rolling: 63000, actual: 8000, monthly: monthlySpread(60000, 0.8) },
     ],
   },
+];
+
+export const budgetLines: BudgetLine[] = [
+  { id: 'bl-001', codice: 'BL-2026-001', nome: 'Modernizzazione Infrastruttura IT', area: 'IT Infrastructure', responsabile: 'Marco Bianchi', anno: 2026, budgetTotale: 660000 },
+  { id: 'bl-002', codice: 'BL-2026-002', nome: 'Trasformazione ERP SAP S/4HANA', area: 'Application Management', responsabile: 'Laura Verdi', anno: 2026, budgetTotale: 750000 },
+  { id: 'bl-003', codice: 'BL-2026-003', nome: 'Sicurezza & Cyber Resilienza', area: 'Cybersecurity', responsabile: 'Alessandro Neri', anno: 2026, budgetTotale: 320000 },
+  { id: 'bl-004', codice: 'BL-2026-004', nome: 'Digital Workplace 2026', area: 'Digital Workplace', responsabile: 'Francesca Romano', anno: 2026, budgetTotale: 210000 },
+  { id: 'bl-005', codice: 'BL-2026-005', nome: 'Data Platform & Analytics', area: 'Data & Analytics', responsabile: 'Stefano Conti', anno: 2026, budgetTotale: 560000 },
 ];
 
 function addDays(iso: string, days: number): string {
@@ -291,8 +316,8 @@ export const entrateMerciPianificate: EntrataMerciPianificata[] = [
 ];
 
 // ---- Persistence (localStorage) ----
-// v4: aggiunto accertamenti e entrate merci pianificate
-const STORAGE_KEY = 'a2a-budget-tool-data-v4';
+// v5: added budgetLineId to WBS, added budgetLines array
+const STORAGE_KEY = 'a2a-budget-tool-data-v5';
 
 interface PersistedData {
   wbs: WBS[];
@@ -362,6 +387,12 @@ export function addAccertamento(a: Accertamento): void {
 export function accertatoOf(wbsId: string): number {
   return accertamenti
     .filter(a => a.wbsId === wbsId)
+    .reduce((s, a) => s + a.importo, 0);
+}
+
+export function accertatoByVoce(wbsId: string, voceCosto: string): number {
+  return accertamenti
+    .filter(a => a.wbsId === wbsId && a.voceCosto === voceCosto)
     .reduce((s, a) => s + a.importo, 0);
 }
 

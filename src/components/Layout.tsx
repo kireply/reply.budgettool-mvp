@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, FolderKanban, ShoppingCart, BarChart3,
-  Settings, Bell, User, RotateCcw
+  Settings, Bell, User, RotateCcw, Layers
 } from 'lucide-react';
 import { colors, weight } from '../theme';
 import { resetDemoData } from '../data/mockData';
@@ -10,6 +10,7 @@ import LanguageSelect from './LanguageSelect';
 
 const navItems = [
   { path: '/', icon: LayoutDashboard, labelKey: 'nav.dashboard' },
+  { path: '/budget-lines', icon: Layers, labelKey: 'nav.budgetLines' },
   { path: '/wbs', icon: FolderKanban, labelKey: 'nav.wbs' },
   { path: '/purchase-requests', icon: ShoppingCart, labelKey: 'nav.pr' },
   { path: '/reportistica', icon: BarChart3, labelKey: 'nav.report' },

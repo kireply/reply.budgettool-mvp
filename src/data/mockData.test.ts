@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   purchaseRequests, impegnatoOf, addPurchaseRequest, updatePRStatus,
+  budgetLines, wbsData, accertatoByVoce,
   type PurchaseRequest,
 } from './mockData';
 
@@ -51,6 +52,40 @@ describe('impegnatoOf', () => {
     expect(impegnatoOf('wbs-001')).toBe(base + 10000);
     updatePRStatus('test-live', 'Rifiutata');
     expect(impegnatoOf('wbs-001')).toBe(base);
+  });
+});
+
+describe('budgetLines', () => {
+  it('should esportare un array di 5 righe di budget con id univoci', () => {
+    expect(budgetLines).toHaveLength(5);
+    const ids = budgetLines.map(bl => bl.id);
+    expect(new Set(ids).size).toBe(5);
+  });
+
+  it('should avere ogni WBS seed con budgetLineId che punta a una BudgetLine esistente', () => {
+    const blIds = new Set(budgetLines.map(bl => bl.id));
+    const seedWbs = wbsData.filter(w => w.id.startsWith('wbs-00'));
+    for (const wbs of seedWbs) {
+      expect(blIds.has(wbs.budgetLineId),
+        `wbs ${wbs.id} ha budgetLineId='${wbs.budgetLineId}' non presente in budgetLines`
+      ).toBe(true);
+    }
+  });
+});
+
+describe('accertatoByVoce', () => {
+  it('should sommare gli accertamenti filtrati per wbsId e voceCosto', () => {
+    // acc-001 (8000) + acc-003 (9000) = 17000
+    expect(accertatoByVoce('wbs-001', 'Licenze Software')).toBe(17000);
+    // acc-002 (12500)
+    expect(accertatoByVoce('wbs-001', 'Servizi Cloud')).toBe(12500);
+    // acc-004 (22000) + acc-005 (18000) = 40000
+    expect(accertatoByVoce('wbs-002', 'Consulenza Esterna')).toBe(40000);
+  });
+
+  it('should restituire 0 per wbs o voce senza accertamenti', () => {
+    expect(accertatoByVoce('wbs-999', 'Qualsiasi')).toBe(0);
+    expect(accertatoByVoce('wbs-001', 'Voce Inesistente')).toBe(0);
   });
 });
 
