@@ -108,7 +108,7 @@ export const wbsData: WBS[] = [
     responsabile: 'Marco Bianchi',
     area: 'IT Infrastructure',
     centroCosto: 'CC-IT-001',
-    legalEntity: 'A2A S.p.A.',
+    legalEntity: 'Reply S.p.A.',
     fornitore: 'Amazon Web Services',
     anno: 2026,
     stato: 'Attiva',
@@ -128,7 +128,7 @@ export const wbsData: WBS[] = [
     responsabile: 'Laura Verdi',
     area: 'Application Management',
     centroCosto: 'CC-IT-002',
-    legalEntity: 'A2A S.p.A.',
+    legalEntity: 'Reply S.p.A.',
     fornitore: 'SAP Italia',
     anno: 2026,
     stato: 'Attiva',
@@ -148,7 +148,7 @@ export const wbsData: WBS[] = [
     responsabile: 'Alessandro Neri',
     area: 'Cybersecurity',
     centroCosto: 'CC-IT-003',
-    legalEntity: 'A2A S.p.A.',
+    legalEntity: 'Reply S.p.A.',
     fornitore: 'Leonardo S.p.A.',
     anno: 2026,
     stato: 'Attiva',
@@ -168,7 +168,7 @@ export const wbsData: WBS[] = [
     responsabile: 'Francesca Romano',
     area: 'Digital Workplace',
     centroCosto: 'CC-IT-004',
-    legalEntity: 'A2A Energia S.r.l.',
+    legalEntity: 'Reply Energia S.r.l.',
     fornitore: 'Microsoft Italia',
     anno: 2026,
     stato: 'Attiva',
@@ -188,7 +188,7 @@ export const wbsData: WBS[] = [
     responsabile: 'Stefano Conti',
     area: 'Data & Analytics',
     centroCosto: 'CC-IT-005',
-    legalEntity: 'A2A Smart City S.r.l.',
+    legalEntity: 'Reply Smart City S.r.l.',
     fornitore: 'Capgemini Italia',
     anno: 2026,
     stato: 'Attiva',
@@ -208,7 +208,7 @@ export const wbsData: WBS[] = [
     responsabile: 'Roberto Esposito',
     area: 'IT Infrastructure',
     centroCosto: 'CC-IT-001',
-    legalEntity: 'A2A S.p.A.',
+    legalEntity: 'Reply S.p.A.',
     fornitore: 'TIM Enterprise',
     anno: 2026,
     stato: 'Sospesa',
@@ -394,7 +394,7 @@ export function resetDemoData(): void {
 // Derived AFTER hydration so persisted entries are included
 export const areas = [...new Set(wbsData.map(w => w.area))];
 export const years = [2025, 2026, 2027];
-export const legalEntities = ['A2A S.p.A.', 'A2A Energia S.r.l.', 'A2A Smart City S.r.l.'];
+export const legalEntities = ['Reply S.p.A.', 'Reply Energia S.r.l.', 'Reply Smart City S.r.l.'];
 
 export const vociCosto = [
   'Licenze Software', 'Servizi Cloud', 'Hardware', 'Consulenza Esterna',

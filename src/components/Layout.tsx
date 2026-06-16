@@ -43,9 +43,9 @@ export default function Layout({ children }: LayoutProps) {
               background: colors.azure500,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontWeight: weight.bold, color: 'white', fontSize: 16,
-            }}>A</div>
+            }}>R</div>
             <div>
-              <div style={{ color: 'white', fontWeight: weight.bold, fontSize: 15, lineHeight: 1.2 }}>A2A</div>
+              <div style={{ color: 'white', fontWeight: weight.bold, fontSize: 15, lineHeight: 1.2 }}>Reply</div>
               <div style={{ color: '#9CC9E8', fontSize: 11 }}>{t('layout.subtitle')}</div>
             </div>
           </div>
@@ -100,7 +100,7 @@ export default function Layout({ children }: LayoutProps) {
             </div>
             <div>
               <div style={{ color: 'white', fontSize: 12, fontWeight: weight.semibold }}>IT Governance</div>
-              <div style={{ color: '#9CC9E8', fontSize: 10 }}>Roberta M.</div>
+              <div style={{ color: '#9CC9E8', fontSize: 10 }}>Utente demo</div>
             </div>
           </div>
         </div>

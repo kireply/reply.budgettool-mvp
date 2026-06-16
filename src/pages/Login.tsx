@@ -41,9 +41,9 @@ export default function Login({ onLogin }: LoginProps) {
             background: colors.azure500,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontWeight: weight.bold, color: 'white', fontSize: 20,
-          }}>A</div>
+          }}>R</div>
           <div>
-            <div style={{ fontWeight: weight.bold, fontSize: 17, color: colors.blue800, lineHeight: 1.2 }}>A2A</div>
+            <div style={{ fontWeight: weight.bold, fontSize: 17, color: colors.blue800, lineHeight: 1.2 }}>Reply</div>
             <div style={{ fontSize: 12, color: colors.grey800 }}>{t('login.title')}</div>
           </div>
         </div>
@@ -102,7 +102,7 @@ export default function Login({ onLogin }: LoginProps) {
         </form>
 
         <div style={{ marginTop: 20, fontSize: 11, color: colors.grey800, opacity: 0.6, textAlign: 'center' }}>
-          Reply per A2A — Demo
+          Reply — Demo
         </div>
       </div>
     </div>
