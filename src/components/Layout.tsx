@@ -127,10 +127,6 @@ export default function Layout({ children }: LayoutProps) {
               transition: 'color 300ms cubic-bezier(0.25, 1, 0.5, 1)',
             }}>
               <Bell size={16} />
-              <span style={{
-                position: 'absolute', top: 4, right: 4,
-                width: 8, height: 8, background: colors.red, borderRadius: '50%',
-              }} />
             </button>
             <div style={{ height: 24, width: 1, background: colors.grey300 }} />
             <div style={{ fontSize: 13, color: colors.grey800 }}>{t('layout.poweredBy')}</div>

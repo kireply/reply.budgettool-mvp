@@ -136,19 +136,42 @@ export default function PurchaseRequests() {
         ))}
       </div>
 
-      {/* Workflow Steps */}
+      {/* Workflow Steps — clickable toggle filters */}
       <div className="card" style={{ marginBottom: 24, padding: '14px 24px' }}>
         <div style={{ fontSize: 12, color: colors.grey800, marginBottom: 8, fontWeight: weight.semibold }}>{t('pr.workflow')}</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
-          {STATUS_FLOW.map((s, i) => (
-            <div key={s} style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{
-                padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: weight.semibold,
-                background: colors.azure50, color: colors.blue500, border: `1px solid ${colors.grey300}`,
-              }}>{t(`status.${s}`)}</div>
-              {i < STATUS_FLOW.length - 1 && <ArrowRight size={16} color={colors.grey300} style={{ margin: '0 4px' }} />}
-            </div>
-          ))}
+          {STATUS_FLOW.map((s, i) => {
+            const active = filterStato === s;
+            const count = prs.filter(p => p.stato === s).length;
+            return (
+              <div key={s} style={{ display: 'flex', alignItems: 'center' }}>
+                <button
+                  onClick={() => setFilterStato(active ? '' : s)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: weight.semibold,
+                    border: `1px solid ${active ? colors.azure500 : colors.grey300}`,
+                    background: active ? colors.azure500 : colors.azure50,
+                    color: active ? 'white' : colors.blue500,
+                    cursor: 'pointer',
+                    transition: 'all 300ms cubic-bezier(0.25, 1, 0.5, 1)',
+                  }}
+                >
+                  {t(`status.${s}`)}
+                  {count > 0 && (
+                    <span style={{
+                      fontSize: 10, fontWeight: weight.bold,
+                      background: active ? 'rgba(255,255,255,0.25)' : colors.grey300,
+                      color: active ? 'white' : colors.grey800,
+                      borderRadius: 10, padding: '1px 6px',
+                      transition: 'all 300ms cubic-bezier(0.25, 1, 0.5, 1)',
+                    }}>{count}</span>
+                  )}
+                </button>
+                {i < STATUS_FLOW.length - 1 && <ArrowRight size={16} color={colors.grey300} style={{ margin: '0 4px' }} />}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -371,29 +394,59 @@ export default function PurchaseRequests() {
               <h4 style={{ fontSize: 14, fontWeight: weight.semibold, color: colors.blue800, marginBottom: 12 }}>
                 {t('pr.timeline')}
               </h4>
-              {(selectedPR.storia ?? []).map((ev, i, arr) => {
-                const isLast = i === arr.length - 1;
-                const dotColor = ev.stato === 'Rifiutata' ? colors.red
-                  : isLast ? colors.azure500
-                  : colors.green;
-                return (
-                  <div key={i} style={{ display: 'flex', gap: 12 }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <div style={{
-                        width: 10, height: 10, borderRadius: '50%', marginTop: 4,
-                        background: dotColor, flexShrink: 0,
-                      }} />
-                      {!isLast && <div style={{ width: 2, flex: 1, background: colors.grey300, margin: '2px 0' }} />}
-                    </div>
-                    <div style={{ paddingBottom: isLast ? 0 : 14 }}>
-                      <div style={{ fontSize: 13, fontWeight: isLast ? weight.semibold : weight.medium, color: colors.blue800 }}>
-                        {t(`status.${ev.stato}`)}
+              {(() => {
+                const storia = selectedPR.storia ?? [];
+                const isRejected = storia.some(e => e.stato === 'Rifiutata');
+                const storiaMap = new Map(storia.map(e => [e.stato, e.data]));
+                const reachedStates = new Set(storia.map(e => e.stato));
+
+                type TimelineItem = { stato: string; data?: string; future: boolean };
+                const items: TimelineItem[] = [];
+                if (isRejected) {
+                  storia.forEach(e => items.push({ stato: e.stato, data: e.data, future: false }));
+                } else {
+                  STATUS_FLOW.forEach(stato => {
+                    if (reachedStates.has(stato)) {
+                      items.push({ stato, data: storiaMap.get(stato), future: false });
+                    } else {
+                      items.push({ stato, future: true });
+                    }
+                  });
+                }
+
+                const lastReachedIdx = items.reduce((acc, item, i) => (!item.future ? i : acc), -1);
+
+                return items.map((item, i) => {
+                  const isLast = i === items.length - 1;
+                  const isCurrent = i === lastReachedIdx;
+                  const dotColor = item.future ? colors.grey300
+                    : item.stato === 'Rifiutata' ? colors.red
+                    : isCurrent ? colors.azure500
+                    : colors.green;
+                  return (
+                    <div key={i} style={{ display: 'flex', gap: 12 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{
+                          width: 10, height: 10, borderRadius: '50%', marginTop: 4,
+                          background: dotColor, flexShrink: 0,
+                        }} />
+                        {!isLast && <div style={{ width: 2, flex: 1, background: colors.grey300, margin: '2px 0' }} />}
                       </div>
-                      <div style={{ fontSize: 11, color: colors.grey800 }}>{ev.data}</div>
+                      <div style={{ paddingBottom: isLast ? 0 : 14 }}>
+                        <div style={{
+                          fontSize: 13,
+                          fontWeight: isCurrent ? weight.semibold : weight.medium,
+                          color: colors.blue800,
+                          opacity: item.future ? 0.4 : 1,
+                        }}>
+                          {t(`status.${item.stato}`)}
+                        </div>
+                        {item.data && <div style={{ fontSize: 11, color: colors.grey800 }}>{item.data}</div>}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                });
+              })()}
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>

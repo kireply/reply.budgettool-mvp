@@ -34,6 +34,14 @@ export const translations: Record<Lang, Record<string, string>> = {
     'layout.resetData': 'Ripristina dati demo',
     'layout.resetConfirm': 'Ripristinare i dati demo? Le WBS e le PR create andranno perse.',
 
+    // Login
+    'login.title': 'Budget IT 2026',
+    'login.subtitle': 'Accedi per continuare',
+    'login.username': 'Nome utente',
+    'login.password': 'Password',
+    'login.submit': 'ACCEDI',
+    'login.error': 'Credenziali non valide. Riprova.',
+
     // Common
     'common.reset': 'Reset',
     'common.cancel': 'Annulla',
@@ -276,6 +284,14 @@ export const translations: Record<Lang, Record<string, string>> = {
     'layout.language': 'Language',
     'layout.resetData': 'Reset demo data',
     'layout.resetConfirm': 'Reset demo data? Created WBS and PRs will be lost.',
+
+    // Login
+    'login.title': 'IT Budget 2026',
+    'login.subtitle': 'Sign in to continue',
+    'login.username': 'Username',
+    'login.password': 'Password',
+    'login.submit': 'SIGN IN',
+    'login.error': 'Invalid credentials. Please try again.',
 
     // Common
     'common.reset': 'Reset',
@@ -520,6 +536,14 @@ export const translations: Record<Lang, Record<string, string>> = {
     'layout.resetData': 'Réinitialiser les données démo',
     'layout.resetConfirm': 'Réinitialiser les données démo ? Les WBS et PR créées seront perdues.',
 
+    // Login
+    'login.title': 'Budget IT 2026',
+    'login.subtitle': 'Connectez-vous pour continuer',
+    'login.username': "Nom d'utilisateur",
+    'login.password': 'Mot de passe',
+    'login.submit': 'SE CONNECTER',
+    'login.error': 'Identifiants invalides. Veuillez réessayer.',
+
     // Common
     'common.reset': 'Réinitialiser',
     'common.cancel': 'Annuler',
@@ -762,6 +786,14 @@ export const translations: Record<Lang, Record<string, string>> = {
     'layout.language': 'Sprache',
     'layout.resetData': 'Demodaten zurücksetzen',
     'layout.resetConfirm': 'Demodaten zurücksetzen? Erstellte WBS und PRs gehen verloren.',
+
+    // Login
+    'login.title': 'IT-Budget 2026',
+    'login.subtitle': 'Anmelden, um fortzufahren',
+    'login.username': 'Benutzername',
+    'login.password': 'Passwort',
+    'login.submit': 'ANMELDEN',
+    'login.error': 'Ungültige Anmeldedaten. Bitte erneut versuchen.',
 
     // Common
     'common.reset': 'Zurücksetzen',
