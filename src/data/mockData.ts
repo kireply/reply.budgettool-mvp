@@ -58,6 +58,33 @@ export interface PurchaseRequest {
   storia: StatusEvent[];
 }
 
+export interface Accertamento {
+  id: string;
+  wbsId: string;
+  voceCosto: string;
+  mese: string;
+  anno: number;
+  importo: number;
+  note: string;
+  creatore: string;
+  dataCreazione: string;
+}
+
+export type EMStato = 'Pianificata' | 'Confermata' | 'Ricevuta SAP';
+
+export interface EntrataMerciPianificata {
+  id: string;
+  wbsId: string;
+  voceCosto: string;
+  fornitore: string;
+  dataPrevista: string;
+  importo: number;
+  stato: EMStato;
+  note: string;
+  creatore: string;
+  dataCreazione: string;
+}
+
 export const MONTHS = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
 
 function monthlySpread(total: number, variance = 0.2): MonthlyData[] {
@@ -196,15 +223,11 @@ export const wbsData: WBS[] = [
 ];
 
 function addDays(iso: string, days: number): string {
-  // tutto in UTC: parse locale + toISOString farebbe slittare la data di un giorno
   const d = new Date(iso + 'T00:00:00Z');
   d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().split('T')[0];
 }
 
-// Storia seed: transizioni a pochi giorni di distanza dalla creazione.
-// Una PR Rifiutata segue Bozza → Inviata → Rifiutata; le altre percorrono
-// STATUS_FLOW fino allo stato finale.
 function storiaFor(finale: PRStatus, creata: string): StatusEvent[] {
   const chain: PRStatus[] = finale === 'Rifiutata'
     ? ['Bozza', 'Inviata', 'Rifiutata']
@@ -246,20 +269,44 @@ export const purchaseRequests: PurchaseRequest[] = [
   seedPR(13, wbsData[3], 'Device Management', 'TBD', 12000, 'Bozza', '2026-05-05', 'Acquisto laptop Q2'),
 ];
 
+// Accertamenti mensili: stime manuali di lavoro eseguito non ancora fatturato.
+// Rappresentano la quota "accertato" del consuntivo (Actual SAP + Accertato = Consuntivo Totale).
+export const accertamenti: Accertamento[] = [
+  { id: 'acc-001', wbsId: 'wbs-001', voceCosto: 'Licenze Software', mese: 'Gen', anno: 2026, importo: 8000, note: 'Rateo mensile canoni licenza', creatore: 'Marco Bianchi', dataCreazione: '2026-01-31' },
+  { id: 'acc-002', wbsId: 'wbs-001', voceCosto: 'Servizi Cloud', mese: 'Apr', anno: 2026, importo: 12500, note: 'Avanzamento deployment Q2 — stima 35%', creatore: 'Marco Bianchi', dataCreazione: '2026-04-30' },
+  { id: 'acc-003', wbsId: 'wbs-001', voceCosto: 'Licenze Software', mese: 'Mag', anno: 2026, importo: 9000, note: 'Rateo mensile canoni licenza', creatore: 'Marco Bianchi', dataCreazione: '2026-05-31' },
+  { id: 'acc-004', wbsId: 'wbs-002', voceCosto: 'Consulenza Esterna', mese: 'Mar', anno: 2026, importo: 22000, note: 'Milestone M1 — avanzamento parziale', creatore: 'Laura Verdi', dataCreazione: '2026-03-31' },
+  { id: 'acc-005', wbsId: 'wbs-002', voceCosto: 'Consulenza Esterna', mese: 'Mag', anno: 2026, importo: 18000, note: 'Avanzamento fase FICO — stima 40%', creatore: 'Laura Verdi', dataCreazione: '2026-05-31' },
+  { id: 'acc-006', wbsId: 'wbs-004', voceCosto: 'Microsoft 365', mese: 'Apr', anno: 2026, importo: 7500, note: 'Rateo utenze Q2', creatore: 'Francesca Romano', dataCreazione: '2026-04-30' },
+  { id: 'acc-007', wbsId: 'wbs-005', voceCosto: 'Data Engineering', mese: 'Mar', anno: 2026, importo: 15000, note: 'Sprint 1-2 — accertamento parziale', creatore: 'Stefano Conti', dataCreazione: '2026-03-31' },
+  { id: 'acc-008', wbsId: 'wbs-005', voceCosto: 'BI & Reporting', mese: 'Mag', anno: 2026, importo: 11000, note: 'Dashboard direzionali — avanzamento 40%', creatore: 'Stefano Conti', dataCreazione: '2026-05-31' },
+];
+
+// Entrate merci pianificate: goods receipt futuri già pianificati dai gestori operativi.
+export const entrateMerciPianificate: EntrataMerciPianificata[] = [
+  { id: 'emp-001', wbsId: 'wbs-001', voceCosto: 'Servizi Cloud', fornitore: 'Amazon Web Services', dataPrevista: '2026-07-15', importo: 45000, stato: 'Pianificata', note: 'Rinnovo contratto AWS EC2 — Q3', creatore: 'Marco Bianchi', dataCreazione: '2026-05-20' },
+  { id: 'emp-002', wbsId: 'wbs-002', voceCosto: 'Consulenza Esterna', fornitore: 'SAP Italia', dataPrevista: '2026-08-01', importo: 80000, stato: 'Confermata', note: 'Fase 2 implementazione — milestone confermata', creatore: 'Laura Verdi', dataCreazione: '2026-05-15' },
+  { id: 'emp-003', wbsId: 'wbs-003', voceCosto: 'Servizi SOC Gestito', fornitore: 'Leonardo S.p.A.', dataPrevista: '2026-09-01', importo: 30000, stato: 'Pianificata', note: 'Servizi SOC H2 2026 — primo lotto', creatore: 'Alessandro Neri', dataCreazione: '2026-05-10' },
+  { id: 'emp-004', wbsId: 'wbs-005', voceCosto: 'Data Engineering', fornitore: 'Capgemini Italia', dataPrevista: '2026-06-30', importo: 55000, stato: 'Pianificata', note: 'Sprint 3-4 Data Lake — consegna fine giugno', creatore: 'Stefano Conti', dataCreazione: '2026-05-25' },
+];
+
 // ---- Persistence (localStorage) ----
-// The prototype has no backend: created WBS, created PRs, and PR status changes
-// are persisted to localStorage and rehydrated into the module arrays on load.
-// Bump the version when the seed data above changes shape.
-const STORAGE_KEY = 'a2a-budget-tool-data-v3'; // v3: impegnato derivato dalle PR + storia stati PR
+// v4: aggiunto accertamenti e entrate merci pianificate
+const STORAGE_KEY = 'a2a-budget-tool-data-v4';
 
 interface PersistedData {
   wbs: WBS[];
   prs: PurchaseRequest[];
+  accertamenti: Accertamento[];
+  emp: EntrataMerciPianificata[];
 }
 
 function persist(): void {
   try {
-    const data: PersistedData = { wbs: wbsData, prs: purchaseRequests };
+    const data: PersistedData = {
+      wbs: wbsData, prs: purchaseRequests,
+      accertamenti, emp: entrateMerciPianificate,
+    };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch {
     // storage full or unavailable: the app keeps working without persistence
@@ -274,9 +321,14 @@ function hydrate(): void {
     if (Array.isArray(data.wbs) && Array.isArray(data.prs)) {
       wbsData.splice(0, wbsData.length, ...data.wbs);
       purchaseRequests.splice(0, purchaseRequests.length, ...data.prs);
+      if (Array.isArray(data.accertamenti)) {
+        accertamenti.splice(0, accertamenti.length, ...data.accertamenti);
+      }
+      if (Array.isArray(data.emp)) {
+        entrateMerciPianificate.splice(0, entrateMerciPianificate.length, ...data.emp);
+      }
     }
   } catch {
-    // corrupted payload: start over from the seed data
     localStorage.removeItem(STORAGE_KEY);
   }
 }
@@ -302,11 +354,32 @@ export function updatePRStatus(id: string, stato: PRStatus): void {
   }
 }
 
+export function addAccertamento(a: Accertamento): void {
+  accertamenti.unshift(a);
+  persist();
+}
+
+export function accertatoOf(wbsId: string): number {
+  return accertamenti
+    .filter(a => a.wbsId === wbsId)
+    .reduce((s, a) => s + a.importo, 0);
+}
+
+export function addEMP(e: EntrataMerciPianificata): void {
+  entrateMerciPianificate.unshift(e);
+  persist();
+}
+
+export function updateEMPStato(id: string, stato: EMStato): void {
+  const emp = entrateMerciPianificate.find(e => e.id === id);
+  if (emp) {
+    emp.stato = stato;
+    persist();
+  }
+}
+
 const COMMITTED_STATES: PRStatus[] = ['Approvata', 'Inviata a SAP', 'PO Creato'];
 
-// L'impegnato di una WBS deriva dal workflow PR: solo le PR confermate
-// impegnano budget. Il budget check in PurchaseRequests.tsx resta più
-// prudente (esclude solo le Rifiutate) per prevenire l'overcommit.
 export function impegnatoOf(wbsId: string): number {
   return purchaseRequests
     .filter(p => p.wbsId === wbsId && COMMITTED_STATES.includes(p.stato))
@@ -357,6 +430,15 @@ export function getWBSStatusColor(stato: WBS['stato']): string {
     'Attiva': 'badge badge-approved',
     'Chiusa': 'badge badge-draft',
     'Sospesa': 'badge badge-sent',
+  };
+  return map[stato];
+}
+
+export function getEMPStatusColor(stato: EMStato): string {
+  const map: Record<EMStato, string> = {
+    'Pianificata': 'badge badge-sent',
+    'Confermata': 'badge badge-approved',
+    'Ricevuta SAP': 'badge badge-sap',
   };
   return map[stato];
 }
