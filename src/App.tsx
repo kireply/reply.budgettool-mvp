@@ -18,7 +18,7 @@ export default function App() {
       {!authed ? (
         <Login onLogin={() => setAuthed(true)} />
       ) : (
-        <BrowserRouter>
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
           <Layout>
             <Routes>
               <Route path="/" element={<Dashboard />} />

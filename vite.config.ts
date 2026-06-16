@@ -7,5 +7,6 @@ import { viteSingleFile } from 'vite-plugin-singlefile'
 // (application/octet-stream), which browsers reject — inline scripts avoid
 // any external module fetch entirely.
 export default defineConfig({
+  base: '/reply.budgettool-mvp/',
   plugins: [react(), viteSingleFile()],
 })
