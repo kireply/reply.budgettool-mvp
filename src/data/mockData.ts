@@ -57,11 +57,13 @@ export interface PurchaseRequest {
   dataCreazione: string;
   note: string;
   storia: StatusEvent[];
+  milestoni?: Milestone[];
 }
 
 export interface Accertamento {
   id: string;
   wbsId: string;
+  prId?: string;
   voceCosto: string;
   mese: string;
   anno: number;
@@ -94,6 +96,15 @@ export interface BudgetLine {
   responsabile: string;
   anno: number;
   budgetTotale: number;
+}
+
+export interface Milestone {
+  id: string;
+  label: string;
+  descrizione: string;
+  importo: number;
+  dataScadenza: string;
+  raggiunta: boolean;
 }
 
 export const MONTHS = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
@@ -280,16 +291,33 @@ function seedPR(
 // (185k / 320k / 95k / 82k / 198k / 45k). Numerazione in ordine cronologico.
 export const purchaseRequests: PurchaseRequest[] = [
   seedPR(1, wbsData[2], 'Servizi SOC Gestito', 'Leonardo S.p.A.', 45000, 'Approvata', '2026-01-20', 'Servizi SOC H1 2026'),
-  seedPR(2, wbsData[0], 'Licenze Software', 'Amazon Web Services', 100000, 'PO Creato', '2026-01-28', 'Rinnovo licenze annuali piattaforma'),
-  seedPR(3, wbsData[3], 'Microsoft 365', 'Microsoft Italia', 82000, 'PO Creato', '2026-02-03', 'Rinnovo tenant M365 E3'),
+  { ...seedPR(2, wbsData[0], 'Licenze Software', 'Amazon Web Services', 100000, 'PO Creato', '2026-01-28', 'Rinnovo licenze annuali piattaforma'), milestoni: [
+    { id: 'ms-002-1', label: 'M1', descrizione: 'Acquisto e attivazione licenze base', importo: 40000, dataScadenza: '2026-01-31', raggiunta: true },
+    { id: 'ms-002-2', label: 'M2', descrizione: 'Deploy moduli enterprise', importo: 35000, dataScadenza: '2026-03-31', raggiunta: true },
+    { id: 'ms-002-3', label: 'M3', descrizione: 'Supporto e ottimizzazione post-go-live', importo: 25000, dataScadenza: '2026-06-30', raggiunta: false },
+  ] as Milestone[] },
+  { ...seedPR(3, wbsData[3], 'Microsoft 365', 'Microsoft Italia', 82000, 'PO Creato', '2026-02-03', 'Rinnovo tenant M365 E3'), milestoni: [
+    { id: 'ms-003-1', label: 'M1', descrizione: 'Provisioning tenant e migrazione account', importo: 42000, dataScadenza: '2026-02-28', raggiunta: true },
+    { id: 'ms-003-2', label: 'M2', descrizione: 'Rollout completo e formazione utenti', importo: 40000, dataScadenza: '2026-04-30', raggiunta: false },
+  ] as Milestone[] },
   seedPR(4, wbsData[0], 'Servizi Cloud', 'Amazon Web Services', 85000, 'Approvata', '2026-02-15', 'Rinnovo contratto AWS EC2 - Q1'),
   seedPR(5, wbsData[4], 'Data Engineering', 'Capgemini Italia', 110000, 'Approvata', '2026-02-24', 'Sprint 1-2 Data Lake'),
   seedPR(6, wbsData[1], 'Consulenza Esterna', 'SAP Italia', 150000, 'Inviata a SAP', '2026-03-01', 'Fase 1 implementazione FICO'),
-  seedPR(7, wbsData[5], 'Circuiti WAN', 'TIM Enterprise', 45000, 'PO Creato', '2026-03-09', 'Canoni circuiti WAN H1'),
-  seedPR(8, wbsData[1], 'Licenze SAP', 'SAP Italia', 170000, 'PO Creato', '2026-03-16', 'Licenze S/4HANA — primo lotto'),
+  { ...seedPR(7, wbsData[5], 'Circuiti WAN', 'TIM Enterprise', 45000, 'PO Creato', '2026-03-09', 'Canoni circuiti WAN H1'), milestoni: [
+    { id: 'ms-007-1', label: 'M1', descrizione: 'Attivazione circuiti WAN sedi principali', importo: 22000, dataScadenza: '2026-03-31', raggiunta: true },
+    { id: 'ms-007-2', label: 'M2', descrizione: 'Manutenzione e canoni Q2', importo: 23000, dataScadenza: '2026-06-30', raggiunta: false },
+  ] as Milestone[] },
+  { ...seedPR(8, wbsData[1], 'Licenze SAP', 'SAP Italia', 170000, 'PO Creato', '2026-03-16', 'Licenze S/4HANA — primo lotto'), milestoni: [
+    { id: 'ms-008-1', label: 'M1', descrizione: 'Licenze ambiente sviluppo', importo: 60000, dataScadenza: '2026-03-31', raggiunta: true },
+    { id: 'ms-008-2', label: 'M2', descrizione: 'Licenze ambiente test & QA', importo: 60000, dataScadenza: '2026-05-31', raggiunta: true },
+    { id: 'ms-008-3', label: 'M3', descrizione: 'Licenze produzione e go-live', importo: 50000, dataScadenza: '2026-08-31', raggiunta: false },
+  ] as Milestone[] },
   seedPR(9, wbsData[1], 'Formazione', 'SAP Italia', 25000, 'Rifiutata', '2026-03-20', 'Training SAP HANA admin — rifiutata: fuori budget'),
   seedPR(10, wbsData[2], 'Tool SIEM', 'Leonardo S.p.A.', 50000, 'Approvata', '2026-03-27', 'Estensione licenza SIEM'),
-  seedPR(11, wbsData[4], 'BI & Reporting', 'Capgemini Italia', 88000, 'PO Creato', '2026-04-02', 'Sviluppo dashboard direzionali'),
+  { ...seedPR(11, wbsData[4], 'BI & Reporting', 'Capgemini Italia', 88000, 'PO Creato', '2026-04-02', 'Sviluppo dashboard direzionali'), milestoni: [
+    { id: 'ms-011-1', label: 'M1', descrizione: 'Architettura e design dashboard', importo: 44000, dataScadenza: '2026-04-30', raggiunta: true },
+    { id: 'ms-011-2', label: 'M2', descrizione: 'Sviluppo e delivery dashboard direzionali', importo: 44000, dataScadenza: '2026-06-30', raggiunta: false },
+  ] as Milestone[] },
   seedPR(12, wbsData[4], 'Data Engineering', 'Capgemini Italia', 98000, 'Inviata', '2026-04-10', 'Sprint 3-4 Data Lake'),
   seedPR(13, wbsData[3], 'Device Management', 'TBD', 12000, 'Bozza', '2026-05-05', 'Acquisto laptop Q2'),
 ];
@@ -297,14 +325,14 @@ export const purchaseRequests: PurchaseRequest[] = [
 // Accertamenti mensili: stime manuali di lavoro eseguito non ancora fatturato.
 // Rappresentano la quota "accertato" del consuntivo (Actual SAP + Accertato = Consuntivo Totale).
 export const accertamenti: Accertamento[] = [
-  { id: 'acc-001', wbsId: 'wbs-001', voceCosto: 'Licenze Software', mese: 'Gen', anno: 2026, importo: 8000, note: 'Rateo mensile canoni licenza', creatore: 'Marco Bianchi', dataCreazione: '2026-01-31' },
+  { id: 'acc-001', wbsId: 'wbs-001', prId: 'pr-002', voceCosto: 'Licenze Software', mese: 'Gen', anno: 2026, importo: 8000, note: 'Rateo mensile canoni licenza', creatore: 'Marco Bianchi', dataCreazione: '2026-01-31' },
   { id: 'acc-002', wbsId: 'wbs-001', voceCosto: 'Servizi Cloud', mese: 'Apr', anno: 2026, importo: 12500, note: 'Avanzamento deployment Q2 — stima 35%', creatore: 'Marco Bianchi', dataCreazione: '2026-04-30' },
-  { id: 'acc-003', wbsId: 'wbs-001', voceCosto: 'Licenze Software', mese: 'Mag', anno: 2026, importo: 9000, note: 'Rateo mensile canoni licenza', creatore: 'Marco Bianchi', dataCreazione: '2026-05-31' },
+  { id: 'acc-003', wbsId: 'wbs-001', prId: 'pr-002', voceCosto: 'Licenze Software', mese: 'Mag', anno: 2026, importo: 9000, note: 'Rateo mensile canoni licenza', creatore: 'Marco Bianchi', dataCreazione: '2026-05-31' },
   { id: 'acc-004', wbsId: 'wbs-002', voceCosto: 'Consulenza Esterna', mese: 'Mar', anno: 2026, importo: 22000, note: 'Milestone M1 — avanzamento parziale', creatore: 'Laura Verdi', dataCreazione: '2026-03-31' },
   { id: 'acc-005', wbsId: 'wbs-002', voceCosto: 'Consulenza Esterna', mese: 'Mag', anno: 2026, importo: 18000, note: 'Avanzamento fase FICO — stima 40%', creatore: 'Laura Verdi', dataCreazione: '2026-05-31' },
-  { id: 'acc-006', wbsId: 'wbs-004', voceCosto: 'Microsoft 365', mese: 'Apr', anno: 2026, importo: 7500, note: 'Rateo utenze Q2', creatore: 'Francesca Romano', dataCreazione: '2026-04-30' },
+  { id: 'acc-006', wbsId: 'wbs-004', prId: 'pr-003', voceCosto: 'Microsoft 365', mese: 'Apr', anno: 2026, importo: 7500, note: 'Rateo utenze Q2', creatore: 'Francesca Romano', dataCreazione: '2026-04-30' },
   { id: 'acc-007', wbsId: 'wbs-005', voceCosto: 'Data Engineering', mese: 'Mar', anno: 2026, importo: 15000, note: 'Sprint 1-2 — accertamento parziale', creatore: 'Stefano Conti', dataCreazione: '2026-03-31' },
-  { id: 'acc-008', wbsId: 'wbs-005', voceCosto: 'BI & Reporting', mese: 'Mag', anno: 2026, importo: 11000, note: 'Dashboard direzionali — avanzamento 40%', creatore: 'Stefano Conti', dataCreazione: '2026-05-31' },
+  { id: 'acc-008', wbsId: 'wbs-005', prId: 'pr-011', voceCosto: 'BI & Reporting', mese: 'Mag', anno: 2026, importo: 11000, note: 'Dashboard direzionali — avanzamento 40%', creatore: 'Stefano Conti', dataCreazione: '2026-05-31' },
 ];
 
 // Entrate merci pianificate: goods receipt futuri già pianificati dai gestori operativi.
@@ -316,8 +344,8 @@ export const entrateMerciPianificate: EntrataMerciPianificata[] = [
 ];
 
 // ---- Persistence (localStorage) ----
-// v5: added budgetLineId to WBS, added budgetLines array
-const STORAGE_KEY = 'a2a-budget-tool-data-v5';
+// v6: added Milestone on PurchaseRequest, prId on Accertamento
+const STORAGE_KEY = 'a2a-budget-tool-data-v6';
 
 interface PersistedData {
   wbs: WBS[];
@@ -394,6 +422,29 @@ export function accertatoByVoce(wbsId: string, voceCosto: string): number {
   return accertamenti
     .filter(a => a.wbsId === wbsId && a.voceCosto === voceCosto)
     .reduce((s, a) => s + a.importo, 0);
+}
+
+export function accertatoByPO(prId: string): number {
+  return accertamenti
+    .filter(a => a.prId === prId)
+    .reduce((s, a) => s + a.importo, 0);
+}
+
+export function addMilestone(prId: string, m: Milestone): void {
+  const pr = purchaseRequests.find(p => p.id === prId);
+  if (pr) {
+    pr.milestoni = [...(pr.milestoni ?? []), m];
+    persist();
+  }
+}
+
+export function toggleMilestone(prId: string, milestoneId: string): void {
+  const pr = purchaseRequests.find(p => p.id === prId);
+  const m = pr?.milestoni?.find(ms => ms.id === milestoneId);
+  if (m) {
+    m.raggiunta = !m.raggiunta;
+    persist();
+  }
 }
 
 export function addEMP(e: EntrataMerciPianificata): void {

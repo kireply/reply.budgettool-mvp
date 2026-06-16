@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Plus, Search, CheckCircle, XCircle, ArrowRight, X } from 'lucide-react';
+import { Plus, Search, CheckCircle, XCircle, ArrowRight, X, Flag } from 'lucide-react';
 import {
-  purchaseRequests, wbsData, vociCosto, fornitori, STATUS_FLOW,
+  purchaseRequests, accertamenti, wbsData, vociCosto, fornitori, STATUS_FLOW, MONTHS,
   formatCurrency, getStatusColor, addPurchaseRequest, updatePRStatus,
-  accertatoByVoce,
-  type PurchaseRequest, type PRStatus
+  accertatoByVoce, accertatoByPO, addMilestone, toggleMilestone, addAccertamento,
+  type PurchaseRequest, type PRStatus, type Milestone,
 } from '../data/mockData';
 import { colors, weight } from '../theme';
 import { useI18n } from '../i18n';
@@ -21,6 +21,11 @@ export default function PurchaseRequests() {
   const [search, setSearch] = useState('');
   const [filterStato, setFilterStato] = useState('');
   const [selectedPR, setSelectedPR] = useState<PurchaseRequest | null>(null);
+
+  const [msForm, setMsForm] = useState({ label: '', descrizione: '', importo: '', dataScadenza: '' });
+  const [showMsForm, setShowMsForm] = useState(false);
+  const [accPoForm, setAccPoForm] = useState({ mese: MONTHS[0], importo: '', note: '' });
+  const [showAccPoForm, setShowAccPoForm] = useState(false);
 
   const [form, setForm] = useState({
     wbsId: preselectedWBS || '',
@@ -437,6 +442,214 @@ export default function PurchaseRequests() {
                       </tbody>
                     </table>
                   </div>
+                </div>
+              );
+            })()}
+
+            {/* Milestone di fatturazione — only for PO Creato */}
+            {selectedPR.stato === 'PO Creato' && (() => {
+              const milestoni: Milestone[] = selectedPR.milestoni ?? [];
+              const totMs = milestoni.reduce((s, m) => s + m.importo, 0);
+              const raggiunte = milestoni.filter(m => m.raggiunta).reduce((s, m) => s + m.importo, 0);
+
+              const handleAddMilestone = () => {
+                if (!msForm.label || !msForm.importo || !msForm.dataScadenza) return;
+                const newMs: Milestone = {
+                  id: `ms-${selectedPR.id}-${Date.now()}`,
+                  label: msForm.label,
+                  descrizione: msForm.descrizione,
+                  importo: parseFloat(msForm.importo),
+                  dataScadenza: msForm.dataScadenza,
+                  raggiunta: false,
+                };
+                addMilestone(selectedPR.id, newMs);
+                setPrs([...purchaseRequests]);
+                setSelectedPR(purchaseRequests.find(p => p.id === selectedPR.id) ?? null);
+                setMsForm({ label: '', descrizione: '', importo: '', dataScadenza: '' });
+                setShowMsForm(false);
+              };
+
+              return (
+                <div style={{ borderTop: `1px solid ${colors.grey100}`, paddingTop: 16, marginBottom: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <h4 style={{ fontSize: 14, fontWeight: weight.semibold, color: colors.blue800, margin: 0 }}>
+                      <Flag size={14} style={{ marginRight: 6, verticalAlign: 'middle', color: colors.azure500 }} />
+                      {t('po.milestones')}
+                    </h4>
+                    <div style={{ fontSize: 12, color: colors.grey800 }}>
+                      {formatCurrency(raggiunte)} / {formatCurrency(totMs)}
+                      <span style={{
+                        marginLeft: 8, fontSize: 11, fontWeight: weight.semibold,
+                        color: totMs > 0 && raggiunte === totMs ? colors.green : colors.orange,
+                      }}>
+                        {totMs > 0 ? `${Math.round((raggiunte / totMs) * 100)}%` : '—'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {milestoni.length > 0 && (
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, marginBottom: 8 }}>
+                      <thead>
+                        <tr className="table-head">
+                          <th style={{ padding: '6px 10px', textAlign: 'left' }}>#</th>
+                          <th style={{ padding: '6px 10px', textAlign: 'left' }}>{t('th.descrizione')}</th>
+                          <th style={{ padding: '6px 10px', textAlign: 'right' }}>{t('th.importo')}</th>
+                          <th style={{ padding: '6px 10px', textAlign: 'center' }}>{t('th.scadenza')}</th>
+                          <th style={{ padding: '6px 10px', textAlign: 'center' }}>{t('th.stato')}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {milestoni.map((m, i) => (
+                          <tr key={m.id} style={{ borderBottom: `1px solid ${colors.grey300}`, background: i % 2 === 0 ? 'white' : colors.grey100 }}>
+                            <td style={{ padding: '6px 10px', fontWeight: weight.bold, color: colors.azure500 }}>{m.label}</td>
+                            <td style={{ padding: '6px 10px', color: colors.blue800 }}>{m.descrizione}</td>
+                            <td style={{ padding: '6px 10px', textAlign: 'right', fontWeight: weight.medium }}>{formatCurrency(m.importo)}</td>
+                            <td style={{ padding: '6px 10px', textAlign: 'center', color: colors.grey800 }}>{m.dataScadenza}</td>
+                            <td style={{ padding: '6px 10px', textAlign: 'center' }}>
+                              <button
+                                onClick={() => {
+                                  toggleMilestone(selectedPR.id, m.id);
+                                  setPrs([...purchaseRequests]);
+                                  setSelectedPR(purchaseRequests.find(p => p.id === selectedPR.id) ?? null);
+                                }}
+                                style={{
+                                  padding: '2px 10px', borderRadius: 12, fontSize: 11, fontWeight: weight.semibold, cursor: 'pointer',
+                                  border: `1px solid ${m.raggiunta ? colors.green : colors.grey300}`,
+                                  background: m.raggiunta ? colors.greenLight : 'white',
+                                  color: m.raggiunta ? colors.green : colors.grey800,
+                                  transition: 'all 300ms cubic-bezier(0.25, 1, 0.5, 1)',
+                                }}
+                              >
+                                {m.raggiunta ? t('po.milestoneRaggiunta') : t('po.milestonePendente')}
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+
+                  {!showMsForm ? (
+                    <button onClick={() => setShowMsForm(true)} className="ghost-link" style={{ fontSize: 12 }}>
+                      <Plus size={13} /> {t('po.addMilestone')}
+                    </button>
+                  ) : (
+                    <div style={{ padding: '12px', background: colors.grey100, borderRadius: 8, marginTop: 8 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 130px 140px', gap: 8, marginBottom: 8 }}>
+                        <input placeholder="M4" value={msForm.label}
+                          onChange={e => setMsForm(f => ({ ...f, label: e.target.value }))}
+                          className="input" style={{ fontSize: 12 }} />
+                        <input placeholder={t('th.descrizione')} value={msForm.descrizione}
+                          onChange={e => setMsForm(f => ({ ...f, descrizione: e.target.value }))}
+                          className="input" style={{ fontSize: 12 }} />
+                        <input type="number" placeholder="€" value={msForm.importo}
+                          onChange={e => setMsForm(f => ({ ...f, importo: e.target.value }))}
+                          className="input" style={{ fontSize: 12 }} />
+                        <input type="date" value={msForm.dataScadenza}
+                          onChange={e => setMsForm(f => ({ ...f, dataScadenza: e.target.value }))}
+                          className="input" style={{ fontSize: 12 }} />
+                      </div>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button onClick={handleAddMilestone} className="cta-primary" style={{ fontSize: 12, padding: '6px 14px' }}>
+                          {t('po.salvaMilestone')} <span className="cta-circle"><ArrowRight size={12} /></span>
+                        </button>
+                        <button onClick={() => setShowMsForm(false)} className="btn-secondary" style={{ fontSize: 12 }}>
+                          {t('common.cancel')}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* Accertamenti su questo PO — only for PO Creato */}
+            {selectedPR.stato === 'PO Creato' && (() => {
+              const poAccertamenti = accertamenti.filter(a => a.prId === selectedPR.id);
+              const wbs = wbsData.find(w => w.id === selectedPR.wbsId);
+
+              const handleAddAcc = () => {
+                if (!accPoForm.importo || !wbs) return;
+                addAccertamento({
+                  id: `acc-po-${selectedPR.id}-${Date.now()}`,
+                  wbsId: selectedPR.wbsId,
+                  prId: selectedPR.id,
+                  voceCosto: selectedPR.voceCosto,
+                  mese: accPoForm.mese,
+                  anno: new Date().getFullYear(),
+                  importo: parseFloat(accPoForm.importo),
+                  note: accPoForm.note,
+                  creatore: 'Utente corrente',
+                  dataCreazione: new Date().toISOString().split('T')[0],
+                });
+                setPrs([...purchaseRequests]);
+                setAccPoForm({ mese: MONTHS[0], importo: '', note: '' });
+                setShowAccPoForm(false);
+              };
+
+              return (
+                <div style={{ borderTop: `1px solid ${colors.grey100}`, paddingTop: 16, marginBottom: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <h4 style={{ fontSize: 14, fontWeight: weight.semibold, color: colors.blue800, margin: 0 }}>
+                      {t('po.accertamentiPO')}
+                    </h4>
+                    {poAccertamenti.length > 0 && (
+                      <span style={{ fontSize: 12, color: colors.orange, fontWeight: weight.semibold }}>
+                        {formatCurrency(accertatoByPO(selectedPR.id))}
+                      </span>
+                    )}
+                  </div>
+
+                  {poAccertamenti.length > 0 && (
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, marginBottom: 8 }}>
+                      <thead>
+                        <tr className="table-head">
+                          <th style={{ padding: '6px 10px', textAlign: 'left' }}>{t('th.mese')}</th>
+                          <th style={{ padding: '6px 10px', textAlign: 'left' }}>{t('th.voce')}</th>
+                          <th style={{ padding: '6px 10px', textAlign: 'right' }}>{t('th.importo')}</th>
+                          <th style={{ padding: '6px 10px', textAlign: 'left' }}>{t('th.note')}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {poAccertamenti.map((a, i) => (
+                          <tr key={a.id} style={{ borderBottom: `1px solid ${colors.grey300}`, background: i % 2 === 0 ? 'white' : colors.grey100 }}>
+                            <td style={{ padding: '6px 10px', color: colors.blue800, fontWeight: weight.medium }}>{a.mese} {a.anno}</td>
+                            <td style={{ padding: '6px 10px', color: colors.grey800 }}>{a.voceCosto}</td>
+                            <td style={{ padding: '6px 10px', textAlign: 'right', color: colors.orange, fontWeight: weight.semibold }}>{formatCurrency(a.importo)}</td>
+                            <td style={{ padding: '6px 10px', color: colors.grey800, maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.note}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+
+                  {!showAccPoForm ? (
+                    <button onClick={() => setShowAccPoForm(true)} className="ghost-link" style={{ fontSize: 12 }}>
+                      <Plus size={13} /> {t('po.addAccertamento')}
+                    </button>
+                  ) : (
+                    <div style={{ padding: '12px', background: colors.grey100, borderRadius: 8, marginTop: 8 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '100px 130px 1fr', gap: 8, marginBottom: 8 }}>
+                        <select value={accPoForm.mese} onChange={e => setAccPoForm(f => ({ ...f, mese: e.target.value }))} className="select" style={{ fontSize: 12 }}>
+                          {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
+                        </select>
+                        <input type="number" placeholder="€" value={accPoForm.importo}
+                          onChange={e => setAccPoForm(f => ({ ...f, importo: e.target.value }))}
+                          className="input" style={{ fontSize: 12 }} />
+                        <input placeholder={t('th.note')} value={accPoForm.note}
+                          onChange={e => setAccPoForm(f => ({ ...f, note: e.target.value }))}
+                          className="input" style={{ fontSize: 12 }} />
+                      </div>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button onClick={handleAddAcc} className="cta-primary" style={{ fontSize: 12, padding: '6px 14px' }}>
+                          {t('po.salvaAccertamento')} <span className="cta-circle"><ArrowRight size={12} /></span>
+                        </button>
+                        <button onClick={() => setShowAccPoForm(false)} className="btn-secondary" style={{ fontSize: 12 }}>
+                          {t('common.cancel')}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })()}
